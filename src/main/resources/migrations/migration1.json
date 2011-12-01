@@ -1,0 +1,77 @@
+{
+    topic_types: [
+
+        ### Geo Object ###
+
+        {
+            value:           "Name",
+            uri:             "dm4.kiezatlas.geo_object_name",
+            data_type_uri:   "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value:         "Geo Object",
+            uri:           "dm4.kiezatlas.geo_object",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.kiezatlas.geo_object_name",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.contacts.address",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.add_to_create_menu: true
+                    }
+                }
+            ]
+        },
+
+        ### Site ###
+
+        {
+            value:           "Title",
+            uri:             "dm4.kiezatlas.site_title",
+            data_type_uri:   "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value:         "URL Component",
+            uri:           "dm4.kiezatlas.url_component",
+            data_type_uri: "dm4.core.text"
+        },
+        {
+            value:         "Site",
+            uri:           "dm4.kiezatlas.site",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.kiezatlas.site_title",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.kiezatlas.url_component",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.add_to_create_menu: true
+                    }
+                }
+            ]
+        }
+    ]
+}
