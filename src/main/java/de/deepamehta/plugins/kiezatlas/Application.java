@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.kiezatlas;
 
 import de.deepamehta.core.osgi.Activator;
+import de.deepamehta.plugins.webservice.provider.JSONEnabledProvider;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,6 +9,13 @@ import java.util.Set;
 
 
 public class Application extends javax.ws.rs.core.Application {
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        Set classes = new HashSet();
+        classes.add(JSONEnabledProvider.class);
+        return classes;
+    }
 
     @Override
     public Set getSingletons() {

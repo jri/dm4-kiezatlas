@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.kiezatlas;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.CompositeValue;
@@ -31,6 +32,10 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class KiezatlasPlugin extends Plugin {
 
+    private static final String WEBSITE_GEOMAP = "dm4.core.association";
+    private static final String ROLE_TYPE_WEBSITE = "dm4.core.default";
+    private static final String ROLE_TYPE_GEOMAP = "dm4.core.default";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -46,6 +51,17 @@ public class KiezatlasPlugin extends Plugin {
             return dms.getPlugin("de.deepamehta.webclient").getResourceAsStream("web/index.html");
         } catch (Exception e) {
             throw new WebApplicationException(e);
+        }
+    }
+
+    @GET
+    @Path("/geomap/{geomap_id}")
+    public Topic getWebsite(@PathParam("geomap_id") long geomapId) {
+        try {
+            return dms.getTopic(geomapId, false, null).getRelatedTopic(WEBSITE_GEOMAP,
+                ROLE_TYPE_WEBSITE, ROLE_TYPE_GEOMAP, "dm4.kiezatlas.site", false, false);
+        } catch (Exception e) {
+            throw new RuntimeException("Finding the geomap's website topic failed (geomapId=" + geomapId + ")");
         }
     }
 }
