@@ -1,6 +1,8 @@
 package de.deepamehta.plugins.kiezatlas;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
@@ -32,9 +34,14 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class KiezatlasPlugin extends Plugin {
 
+    // Website-Geomap association
     private static final String WEBSITE_GEOMAP = "dm4.core.association";
     private static final String ROLE_TYPE_WEBSITE = "dm4.core.default";
     private static final String ROLE_TYPE_GEOMAP = "dm4.core.default";
+    // Website-Facet Types association
+    private static final String WEBSITE_FACET_TYPES = "dm4.core.association";
+    // private static final String ROLE_TYPE_WEBSITE = "dm4.core.default";
+    private static final String ROLE_TYPE_FACET_TYPE = "dm4.core.default";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -62,6 +69,17 @@ public class KiezatlasPlugin extends Plugin {
                 ROLE_TYPE_WEBSITE, ROLE_TYPE_GEOMAP, "dm4.kiezatlas.site", false, false);
         } catch (Exception e) {
             throw new RuntimeException("Finding the geomap's website topic failed (geomapId=" + geomapId + ")");
+        }
+    }
+
+    @GET
+    @Path("/{website_id}/facets")
+    public ResultSet<RelatedTopic> getFacetTypes(@PathParam("website_id") long websiteId) {
+        try {
+            return dms.getTopic(websiteId, false, null).getRelatedTopics(WEBSITE_FACET_TYPES,
+                ROLE_TYPE_WEBSITE, ROLE_TYPE_FACET_TYPE, "dm4.core.topic_type", false, false, 0);
+        } catch (Exception e) {
+            throw new RuntimeException("Finding the website's facet types failed (websiteId=" + websiteId + ")");
         }
     }
 }
