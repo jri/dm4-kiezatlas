@@ -85,31 +85,46 @@ public class KiezatlasPlugin extends Plugin {
     // ---
 
     @Override
+    public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
+        if (topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
+            ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState, "Retrieving");
+            if (facetTypes == null) {
+                return;
+            }
+            //
+            for (Topic facetType : facetTypes) {
+                String facetTypeUri = facetType.getUri();
+                Topic facet = facetsService.getFacet(topic, facetTypeUri);
+                // ### FIXME: why facet can be null? Note: geo objects created outside a geomap have no facets.
+                // But in this case we shouldn't be here. Is dm4_topicmap_id cookie up-to-date?
+                if (facet != null) {
+                    logger.info("### Retrieving facet of type \"" + facetTypeUri + "\" for geo object " +
+                        topic.getId() + " (facet=" + facet + ")");
+                    topic.getCompositeValue().put(facet.getTypeUri(), facet.getModel());
+                } else {
+                    logger.info("### Retrieving facet of type \"" + facetTypeUri + "\" for geo object " +
+                        topic.getId() + " ABORTED -- no such facet in DB");
+                }
+            }
+        }
+    }
+
+    @Override
     public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                       Directives directives) {
         if (topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
-            long topicmapId = clientState.getLong("dm4_topicmap_id");
-            logger.info("### Updating geo object facets (topicmapId=" + topicmapId + ")");
-            //
-            if (!isGeomap(topicmapId)) {
-                logger.info("Updating geo object facets ABORTED -- topicmap " + topicmapId + " is not a geomap");
+            ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState, "Storing");
+            if (facetTypes == null) {
                 return;
             }
             //
-            Topic website = getWebsite(topicmapId);
-            if (website == null) {
-                logger.info("Updating geo object facets ABORTED -- geomap " + topicmapId +
-                    " is not part of a Kiezatlas website");
-                return;
-            }
-            //
-            for (Topic facetType : getFacetTypes(website.getId())) {
+            for (Topic facetType : facetTypes) {
                 String facetTypeUri = facetType.getUri();
                 String assocDefUri = getAssocDef(facetTypeUri).getUri();
                 TopicModel facet = newModel.getCompositeValue().getTopic(assocDefUri);
-                logger.info("### Adding facet to topic " + topic.getId() + " (facetTypeUri=" + facetTypeUri +
-                    ", facet=" + facet + ")");
-                facetsService.addFacet(topic, facetTypeUri, facet, clientState, directives);
+                logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
+                    " (facet=" + facet + ")");
+                facetsService.setFacet(topic, facetTypeUri, facet, clientState, directives);
             }
         }
     }
@@ -139,9 +154,9 @@ public class KiezatlasPlugin extends Plugin {
     public Topic getWebsite(@PathParam("geomap_id") long geomapId) {
         try {
             return dms.getTopic(geomapId, false, null).getRelatedTopic(WEBSITE_GEOMAP,
-                ROLE_TYPE_WEBSITE, ROLE_TYPE_GEOMAP, "dm4.kiezatlas.site", false, false);
+                ROLE_TYPE_WEBSITE, ROLE_TYPE_GEOMAP, "dm4.kiezatlas.site", false, false, null);
         } catch (Exception e) {
-            throw new RuntimeException("Finding the geomap's website topic failed (geomapId=" + geomapId + ")");
+            throw new RuntimeException("Finding the geomap's website topic failed (geomapId=" + geomapId + ")", e);
         }
     }
 
@@ -150,13 +165,32 @@ public class KiezatlasPlugin extends Plugin {
     public ResultSet<RelatedTopic> getFacetTypes(@PathParam("website_id") long websiteId) {
         try {
             return dms.getTopic(websiteId, false, null).getRelatedTopics(WEBSITE_FACET_TYPES,
-                ROLE_TYPE_WEBSITE, ROLE_TYPE_FACET_TYPE, "dm4.core.topic_type", false, false, 0);
+                ROLE_TYPE_WEBSITE, ROLE_TYPE_FACET_TYPE, "dm4.core.topic_type", false, false, 0, null);
         } catch (Exception e) {
-            throw new RuntimeException("Finding the website's facet types failed (websiteId=" + websiteId + ")");
+            throw new RuntimeException("Finding the website's facet types failed (websiteId=" + websiteId + ")", e);
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private ResultSet<RelatedTopic> getFacetTypes(ClientState clientState, String logText) {
+        long topicmapId = clientState.getLong("dm4_topicmap_id");
+        logger.info("### " + logText + " geo object facets (topicmapId=" + topicmapId + ")");
+        //
+        if (!isGeomap(topicmapId)) {
+            logger.info(logText + " geo object facets ABORTED -- topicmap " + topicmapId + " is not a geomap");
+            return null;
+        }
+        //
+        Topic website = getWebsite(topicmapId);
+        if (website == null) {
+            logger.info(logText + " geo object facets ABORTED -- geomap " + topicmapId +
+                " is not part of a Kiezatlas website");
+            return null;
+        }
+        //
+        return getFacetTypes(website.getId());
+    }
 
     private boolean isGeomap(long topicmapId) {
         Topic topicmap = dms.getTopic(topicmapId, true, null);

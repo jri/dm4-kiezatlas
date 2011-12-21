@@ -55,7 +55,8 @@ function kiezatlas_plugin() {
             var assoc_def = facet_type.assoc_defs[0]
             var topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
             var field_uri = dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-            var fields = TopicRenderer.create_fields(topic_type, assoc_def, field_uri, topic, topic, setting)
+            var value_topic = topic.composite[assoc_def.uri]
+            var fields = TopicRenderer.create_fields(topic_type, assoc_def, field_uri, value_topic, topic, setting)
             page_model[assoc_def.uri] = fields
         }
     }
