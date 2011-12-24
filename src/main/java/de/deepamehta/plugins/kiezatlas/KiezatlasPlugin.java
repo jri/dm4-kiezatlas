@@ -87,7 +87,7 @@ public class KiezatlasPlugin extends Plugin {
     @Override
     public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
         if (topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
-            ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState, "Retrieving");
+            ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
             if (facetTypes == null) {
                 return;
             }
@@ -95,8 +95,9 @@ public class KiezatlasPlugin extends Plugin {
             for (Topic facetType : facetTypes) {
                 String facetTypeUri = facetType.getUri();
                 Topic facet = facetsService.getFacet(topic, facetTypeUri);
-                // ### FIXME: why facet can be null? Note: geo objects created outside a geomap have no facets.
-                // But in this case we shouldn't be here. Is dm4_topicmap_id cookie up-to-date?
+                // Note: facet is null in 2 cases:
+                // 1) The geo object has just been created (no update yet)
+                // 2) The geo object has been created inside a non-geomap and then being revealed inside a geomap.
                 if (facet != null) {
                     logger.info("### Retrieving facet of type \"" + facetTypeUri + "\" for geo object " +
                         topic.getId() + " (facet=" + facet + ")");
@@ -113,7 +114,7 @@ public class KiezatlasPlugin extends Plugin {
     public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                       Directives directives) {
         if (topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
-            ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState, "Storing");
+            ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
             if (facetTypes == null) {
                 return;
             }
@@ -173,22 +174,25 @@ public class KiezatlasPlugin extends Plugin {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private ResultSet<RelatedTopic> getFacetTypes(ClientState clientState, String logText) {
+    /**
+     * Finds the geo object facet types for the selected topicmap.
+     */
+    private ResultSet<RelatedTopic> getFacetTypes(ClientState clientState) {
         long topicmapId = clientState.getLong("dm4_topicmap_id");
-        logger.info("### " + logText + " geo object facets (topicmapId=" + topicmapId + ")");
         //
         if (!isGeomap(topicmapId)) {
-            logger.info(logText + " geo object facets ABORTED -- topicmap " + topicmapId + " is not a geomap");
+            logger.info("### Finding geo object facet types for topicmap " + topicmapId + " ABORTED -- not a geomap");
             return null;
         }
         //
         Topic website = getWebsite(topicmapId);
         if (website == null) {
-            logger.info(logText + " geo object facets ABORTED -- geomap " + topicmapId +
-                " is not part of a Kiezatlas website");
+            logger.info("### Finding geo object facet types for geomap " + topicmapId + " ABORTED -- not part of a " +
+                "Kiezatlas website");
             return null;
         }
         //
+        logger.info("### Finding geo object facet types for geomap " + topicmapId);
         return getFacetTypes(website.getId());
     }
 
