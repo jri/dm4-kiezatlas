@@ -1,5 +1,7 @@
 function kiezatlas_plugin() {
 
+    dm4c.register_css_stylesheet("/de.deepamehta.kiezatlas/style/kiezatlas.css")
+
     // extend REST client
     dm4c.restc.get_website = function(geomap_id) {
         return this.request("GET", "/site/geomap/" + geomap_id)
@@ -17,6 +19,7 @@ function kiezatlas_plugin() {
 
 
     this.init = function() {
+        // site launcher ### TODO: not yet functional
         var match = location.pathname.match(/\/site\/(.+)/)
         if (match) {
             alert("Kiezatlas Site \"" + match[1] + "\"")
@@ -25,6 +28,8 @@ function kiezatlas_plugin() {
 
     this.pre_render_page = function(topic, page_model) {
         extend_page(topic, page_model, "viewable")
+        //
+        create_show_all_button()
     }
 
     this.pre_render_form = function(topic, page_model) {
@@ -59,6 +64,14 @@ function kiezatlas_plugin() {
             var fields = TopicRenderer.create_fields(topic_type, assoc_def, field_uri, value_topic, topic, setting)
             page_model[assoc_def.uri] = fields
         }
+    }
+
+    function create_show_all_button() {
+        var show_all_button = dm4c.ui.button(function() {do_show_all()}, "Show All").attr("id", "ka-showall-button")
+        dm4c.render.page(show_all_button)
+    }
+
+    function do_show_all() {
     }
 
     // ---
