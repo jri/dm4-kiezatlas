@@ -2,7 +2,8 @@ function kiezatlas_plugin() {
 
     dm4c.register_css_stylesheet("/de.deepamehta.kiezatlas/style/kiezatlas.css")
 
-    // extend REST client
+    // === REST Client Extension ===
+
     dm4c.restc.get_website = function(geomap_id) {
         return this.request("GET", "/site/geomap/" + geomap_id)
     }
@@ -10,31 +11,25 @@ function kiezatlas_plugin() {
         return this.request("GET", "/site/" + website_id + "/facets")
     }
 
+    // === Webclient Handler ===
 
-
-    // ***********************************************************
-    // *** Webclient Hooks (triggered by deepamehta-webclient) ***
-    // ***********************************************************
-
-
-
-    this.init = function() {
+    dm4c.register_plugin_handler("init", function() {
         // site launcher ### TODO: not yet functional
         var match = location.pathname.match(/\/site\/(.+)/)
         if (match) {
             alert("Kiezatlas Site \"" + match[1] + "\"")
         }
-    }
+    })
 
-    this.pre_render_page = function(topic, page_model) {
+    dm4c.register_plugin_handler("pre_render_page", function(topic, page_model) {
         extend_page(topic, page_model, "viewable")
         //
         create_show_all_button()
-    }
+    })
 
-    this.pre_render_form = function(topic, page_model) {
+    dm4c.register_plugin_handler("pre_render_form", function(topic, page_model) {
         extend_page(topic, page_model, "editable")
-    }
+    })
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
