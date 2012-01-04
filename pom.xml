@@ -25,6 +25,11 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-geomaps</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-facets</artifactId>
             <version>0.2-SNAPSHOT</version>
         </dependency>
