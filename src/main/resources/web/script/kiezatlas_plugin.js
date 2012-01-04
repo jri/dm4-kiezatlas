@@ -23,18 +23,29 @@ function kiezatlas_plugin() {
 
     dm4c.register_plugin_handler("pre_render_page", function(topic, page_model) {
         extend_page(topic, page_model, "viewable")
-        //
-        create_show_all_button()
     })
 
     dm4c.register_plugin_handler("pre_render_form", function(topic, page_model) {
         extend_page(topic, page_model, "editable")
     })
 
+    dm4c.register_plugin_handler("default_page_rendering", function() {
+        var topicmap = get_topicmap()
+        // If we're not on a geomap we display no list
+        if (!is_geomap(topicmap)) {
+            return
+        }
+        //
+        dm4c.render.page("Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>" +
+            "Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>")
+        return false    // suppress webclient's default rendering (splash screen)
+    })
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     /**
      * Extends the page model by the website-specific facets.
+     * Displays "Show All" button.
      */
     function extend_page(topic, page_model, setting) {
         var topicmap = get_topicmap()
@@ -42,6 +53,7 @@ function kiezatlas_plugin() {
         if (!is_geomap(topicmap)) {
             return
         }
+        // 1) extend page model
         var website = dm4c.restc.get_website(topicmap.get_id())
         //
         if (!website) {
@@ -59,14 +71,19 @@ function kiezatlas_plugin() {
             var fields = TopicRenderer.create_fields(topic_type, assoc_def, field_uri, value_topic, topic, setting)
             page_model[assoc_def.uri] = fields
         }
+        // 2) display "Show All" button
+        if (setting == "viewable") {
+            create_show_all_button()
+        }
     }
 
     function create_show_all_button() {
-        var show_all_button = dm4c.ui.button(function() {do_show_all()}, "Show All").attr("id", "ka-showall-button")
+        var show_all_button = dm4c.ui.button(do_show_all, "Show All").attr("id", "ka-showall-button")
         dm4c.render.page(show_all_button)
-    }
 
-    function do_show_all() {
+        function do_show_all() {
+            dm4c.do_reset_selection()
+        }
     }
 
     // ---
