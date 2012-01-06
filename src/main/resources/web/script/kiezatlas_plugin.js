@@ -10,6 +10,9 @@ function kiezatlas_plugin() {
     dm4c.restc.get_facet_types = function(website_id) {
         return this.request("GET", "/site/" + website_id + "/facets")
     }
+    dm4c.restc.get_geo_objects = function(geomap_id) {
+        return dm4c.build_topics(this.request("GET", "/site/geomap/" + geomap_id + "/objects"))
+    }
 
     // === Webclient Handler ===
 
@@ -36,9 +39,23 @@ function kiezatlas_plugin() {
             return
         }
         //
-        dm4c.render.page("Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>" +
-            "Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>Hallo Liste!<br>")
+        var geo_objects = dm4c.restc.get_geo_objects(topicmap.get_id())
+        var listing = dm4c.render.topic_list(geo_objects, undefined, render_handler)
+        dm4c.render.page(listing)
+        //
         return false    // suppress webclient's default rendering (splash screen)
+
+        function render_handler(topic) {
+            var address = topic.get("dm4.contacts.address")
+            if (address) {
+                var street      = address.get("dm4.contacts.street")
+                var postal_code = address.get("dm4.contacts.postal_code")
+                var city        = address.get("dm4.contacts.city")
+                return street + ", " + postal_code + " " + city
+            } else {
+                return "Address unknown"
+            }
+        }
     })
 
     // ----------------------------------------------------------------------------------------------- Private Functions
