@@ -40,10 +40,14 @@ function kiezatlas_plugin() {
         }
         //
         var geo_objects = dm4c.restc.get_geo_objects(topicmap.get_id())
-        var listing = dm4c.render.topic_list(geo_objects, undefined, render_handler)
+        var listing = dm4c.render.topic_list(geo_objects, click_handler, render_handler)
         dm4c.render.page(listing)
         //
         return false    // suppress webclient's default rendering (splash screen)
+
+        function click_handler(topic) {
+            dm4c.do_select_topic(topic.id)
+        }
 
         function render_handler(topic) {
             var address = topic.get("dm4.contacts.address")
@@ -80,9 +84,9 @@ function kiezatlas_plugin() {
         //
         var facet_types = dm4c.restc.get_facet_types(website.id).items
         for (var i = 0; i < facet_types.length; i++) {
-            var facet_type = dm4c.type_cache.get_topic_type(facet_types[i].uri)
+            var facet_type = dm4c.get_topic_type(facet_types[i].uri)
             var assoc_def = facet_type.assoc_defs[0]
-            var topic_type = dm4c.type_cache.get_topic_type(assoc_def.part_topic_type_uri)
+            var topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
             var field_uri = dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
             var value_topic = topic.composite[assoc_def.uri]
             var fields = TopicRenderer.create_fields(topic_type, assoc_def, field_uri, value_topic, topic, setting)
