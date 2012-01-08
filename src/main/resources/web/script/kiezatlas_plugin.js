@@ -49,8 +49,7 @@ function kiezatlas_plugin() {
         function click_handler(topic) {
             var geo_facet = dm4c.get_plugin("geomaps_plugin").get_geo_facet(topic)
             // alert("topic=" + JSON.stringify(topic) + "\n\ngeo_facet=" + JSON.stringify(geo_facet))
-            // ### dm4c.do_select_topic(geo_facet.id)
-            dm4c.canvas.click_feature(geo_facet.id)
+            dm4c.do_select_topic(geo_facet.id)
         }
 
         function render_handler(topic) {
