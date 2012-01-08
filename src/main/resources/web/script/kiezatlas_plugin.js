@@ -38,15 +38,19 @@ function kiezatlas_plugin() {
         if (!is_geomap(topicmap)) {
             return
         }
-        //
+        // fetch geo objects
         var geo_objects = dm4c.restc.get_geo_objects(topicmap.get_id())
-        var listing = dm4c.render.topic_list(geo_objects, click_handler, render_handler)
-        dm4c.render.page(listing)
+        // render list
+        var list = dm4c.render.topic_list(geo_objects, click_handler, render_handler)
+        dm4c.render.page(list)
         //
         return false    // suppress webclient's default rendering (splash screen)
 
         function click_handler(topic) {
-            dm4c.do_select_topic(topic.id)
+            var geo_facet = dm4c.get_plugin("geomaps_plugin").get_geo_facet(topic)
+            // alert("topic=" + JSON.stringify(topic) + "\n\ngeo_facet=" + JSON.stringify(geo_facet))
+            // ### dm4c.do_select_topic(geo_facet.id)
+            dm4c.canvas.click_feature(geo_facet.id)
         }
 
         function render_handler(topic) {
