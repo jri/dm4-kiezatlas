@@ -90,7 +90,7 @@ public class KiezatlasPlugin extends Plugin {
     public Topic getWebsite(@PathParam("geomap_id") long geomapId) {
         try {
             return dms.getTopic(geomapId, false, null).getRelatedTopic(WEBSITE_GEOMAP,
-                ROLE_TYPE_WEBSITE, ROLE_TYPE_GEOMAP, "dm4.kiezatlas.site", false, false, null);
+                ROLE_TYPE_WEBSITE, ROLE_TYPE_GEOMAP, "dm4.kiezatlas.website", false, false, null);
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Finding the geomap's website topic failed " +
                 "(geomapId=" + geomapId + ")", e));

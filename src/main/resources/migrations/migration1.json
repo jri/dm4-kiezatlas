@@ -36,21 +36,21 @@
             ]
         },
 
-        ### Site ###
+        ### Kiezatlas Website ###
 
         {
             value:           "Title",
-            uri:             "dm4.kiezatlas.site_title",
+            uri:             "dm4.kiezatlas.website_title",
             data_type_uri:   "dm4.core.text",
             index_mode_uris: ["dm4.core.fulltext"]
         },
         {
-            value:           "Kiezatlas Site",
-            uri:             "dm4.kiezatlas.site",
+            value:           "Kiezatlas Website",
+            uri:             "dm4.kiezatlas.website",
             data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.kiezatlas.site_title",
+                    part_topic_type_uri:  "dm4.kiezatlas.website_title",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }

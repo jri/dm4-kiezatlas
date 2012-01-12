@@ -56,7 +56,7 @@ function kiezatlas_plugin() {
         }
 
         function render_handler(topic) {
-            var address = topic.get("dm4.contacts.address")
+            var address = topic.find_child_topic("dm4.contacts.address")
             if (address) {
                 var street      = address.get("dm4.contacts.street")
                 var postal_code = address.get("dm4.contacts.postal_code")
@@ -86,7 +86,7 @@ function kiezatlas_plugin() {
         if (!website) {
             alert("WARNING: topicmap \"" + topicmap.get_name() + "\" (" + topicmap.get_id() + ") is not associated " +
                 "to a Kiezatlas website.\n\nNo geo object facets will be displayed.\n\nTo get rid of this warning " +
-                "associate the topicmap to the Kiezatlas website.")
+                "associate the topicmap to a Kiezatlas website.")
             return
         }
         //
