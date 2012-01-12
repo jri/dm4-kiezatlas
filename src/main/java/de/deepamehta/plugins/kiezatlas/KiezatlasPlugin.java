@@ -239,7 +239,7 @@ public class KiezatlasPlugin extends Plugin {
 
     private boolean isGeomap(long topicmapId) {
         Topic topicmap = dms.getTopic(topicmapId, true, null);
-        String rendererUri = topicmap.getCompositeValue().getString("dm4.topicmaps.topicmap_renderer_uri");
+        String rendererUri = topicmap.getCompositeValue().getString("dm4.topicmaps.canvas_renderer_uri");
         return rendererUri.equals("dm4.geomaps.geomap_renderer");
     }
 
