@@ -14,9 +14,9 @@ function kiezatlas_plugin() {
         return dm4c.build_topics(this.request("GET", "/site/geomap/" + geomap_id + "/objects"))
     }
 
-    // === Webclient Handler ===
+    // === Webclient Listeners ===
 
-    dm4c.register_plugin_handler("init", function() {
+    dm4c.register_listener("init", function() {
         // site launcher ### TODO: not yet functional
         var match = location.pathname.match(/\/site\/(.+)/)
         if (match) {
@@ -24,15 +24,15 @@ function kiezatlas_plugin() {
         }
     })
 
-    dm4c.register_plugin_handler("pre_render_page", function(topic, page_model) {
+    dm4c.register_listener("pre_render_page", function(topic, page_model) {
         extend_page(topic, page_model, "viewable")
     })
 
-    dm4c.register_plugin_handler("pre_render_form", function(topic, page_model) {
+    dm4c.register_listener("pre_render_form", function(topic, page_model) {
         extend_page(topic, page_model, "editable")
     })
 
-    dm4c.register_plugin_handler("default_page_rendering", function() {
+    dm4c.register_listener("default_page_rendering", function() {
         var topicmap = get_topicmap()
         // If we're not on a geomap we display no list
         if (!is_geomap(topicmap)) {
