@@ -84,7 +84,9 @@ function kiezatlas_plugin() {
         var website = dm4c.restc.get_website(topicmap.get_id())
         //
         if (!website) {
-            alert("This geomap (" + topicmap.get_id() + ") is not part of a Kiezatlas website.")
+            alert("WARNING: topicmap \"" + topicmap.get_name() + "\" (" + topicmap.get_id() + ") is not associated " +
+                "to a Kiezatlas website.\n\nNo geo object facets will be displayed.\n\nTo get rid of this warning " +
+                "associate the topicmap to the Kiezatlas website.")
             return
         }
         //
