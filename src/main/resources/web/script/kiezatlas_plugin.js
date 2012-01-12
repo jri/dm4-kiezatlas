@@ -1,3 +1,6 @@
+// set window title
+document.title = "Kiezatlas ${project.version} / " + document.title
+
 function kiezatlas_plugin() {
 
     dm4c.register_css_stylesheet("/de.deepamehta.kiezatlas/style/kiezatlas.css")
