@@ -29,6 +29,10 @@ function kiezatlas_plugin() {
 
     dm4c.register_listener("pre_render_page", function(topic, page_model) {
         extend_page(topic, page_model, "viewable")
+        // display "Show All" button
+        if (is_geomap(get_topicmap())) {
+            create_show_all_button()
+        }
     })
 
     dm4c.register_listener("pre_render_form", function(topic, page_model) {
@@ -63,6 +67,7 @@ function kiezatlas_plugin() {
                 var city        = address.get("dm4.contacts.city")
                 return street + ", " + postal_code + " " + city
             } else {
+                // ### FIXME: should not happen anymore. If the topic has no address it shoudn't be on a geomap.
                 return "Address unknown"
             }
         }
@@ -72,15 +77,18 @@ function kiezatlas_plugin() {
 
     /**
      * Extends the page model by the website-specific facets.
-     * Displays "Show All" button.
      */
     function extend_page(topic, page_model, setting) {
+        // If we're not a geo object we display no facets
+        if (topic.type_uri != "dm4.kiezatlas.geo_object") {
+            return
+        }
         var topicmap = get_topicmap()
         // If we're not on a geomap we display no facets
         if (!is_geomap(topicmap)) {
             return
         }
-        // 1) extend page model
+        // extend page model
         var website = dm4c.restc.get_website(topicmap.get_id())
         //
         if (!website) {
@@ -99,10 +107,6 @@ function kiezatlas_plugin() {
             var value_topic = topic.composite[assoc_def.uri]
             var fields = TopicRenderer.create_fields(topic_type, assoc_def, field_uri, value_topic, topic, setting)
             page_model[assoc_def.uri] = fields
-        }
-        // 2) display "Show All" button
-        if (setting == "viewable") {
-            create_show_all_button()
         }
     }
 

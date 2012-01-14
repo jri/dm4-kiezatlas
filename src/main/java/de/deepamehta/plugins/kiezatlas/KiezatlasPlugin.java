@@ -46,6 +46,8 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class KiezatlasPlugin extends Plugin {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
     // Website-Geomap association
     private static final String WEBSITE_GEOMAP = "dm4.core.association";
     private static final String ROLE_TYPE_WEBSITE = "dm4.core.default";
@@ -153,26 +155,27 @@ public class KiezatlasPlugin extends Plugin {
 
     @Override
     public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
-        if (topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
-            ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
-            if (facetTypes == null) {
-                return;
-            }
-            //
-            for (Topic facetType : facetTypes) {
-                String facetTypeUri = facetType.getUri();
-                Topic facet = facetsService.getFacet(topic, facetTypeUri);
-                // Note: facet is null in 2 cases:
-                // 1) The geo object has just been created (no update yet)
-                // 2) The geo object has been created inside a non-geomap and then being revealed inside a geomap.
-                if (facet != null) {
-                    logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri +
-                        "\" facet (" + facet + ")");
-                    topic.getCompositeValue().put(facet.getTypeUri(), facet.getModel());
-                } else {
-                    logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri +
-                        "\" facet ABORTED -- no such facet in DB");
-                }
+        if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
+            return;
+        }
+        ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
+        if (facetTypes == null) {
+            return;
+        }
+        //
+        for (Topic facetType : facetTypes) {
+            String facetTypeUri = facetType.getUri();
+            Topic facet = facetsService.getFacet(topic, facetTypeUri);
+            // Note: facet is null in 2 cases:
+            // 1) The geo object has just been created (no update yet)
+            // 2) The geo object has been created inside a non-geomap and then being revealed inside a geomap.
+            if (facet != null) {
+                logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri +
+                    "\" facet (" + facet + ")");
+                topic.getCompositeValue().put(facet.getTypeUri(), facet.getModel());
+            } else {
+                logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri +
+                    "\" facet ABORTED -- no such facet in DB");
             }
         }
     }
@@ -180,20 +183,21 @@ public class KiezatlasPlugin extends Plugin {
     @Override
     public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                       Directives directives) {
-        if (topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
-            ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
-            if (facetTypes == null) {
-                return;
-            }
-            //
-            for (Topic facetType : facetTypes) {
-                String facetTypeUri = facetType.getUri();
-                String assocDefUri = getAssocDef(facetTypeUri).getUri();
-                TopicModel facet = newModel.getCompositeValue().getTopic(assocDefUri);
-                logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
-                    " (facet=" + facet + ")");
-                facetsService.updateFacet(topic, facetTypeUri, facet, clientState, directives);
-            }
+        if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
+            return;
+        }
+        ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
+        if (facetTypes == null) {
+            return;
+        }
+        //
+        for (Topic facetType : facetTypes) {
+            String facetTypeUri = facetType.getUri();
+            String assocDefUri = getAssocDef(facetTypeUri).getUri();
+            TopicModel facet = newModel.getCompositeValue().getTopic(assocDefUri);
+            logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
+                " (facet=" + facet + ")");
+            facetsService.updateFacet(topic, facetTypeUri, facet, clientState, directives);
         }
     }
 
