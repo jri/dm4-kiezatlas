@@ -192,7 +192,7 @@ public class KiezatlasPlugin extends Plugin {
                 TopicModel facet = newModel.getCompositeValue().getTopic(assocDefUri);
                 logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
                     " (facet=" + facet + ")");
-                facetsService.setFacet(topic, facetTypeUri, facet, clientState, directives);
+                facetsService.updateFacet(topic, facetTypeUri, facet, clientState, directives);
             }
         }
     }
