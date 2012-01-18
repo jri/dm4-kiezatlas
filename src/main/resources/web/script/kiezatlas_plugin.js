@@ -1,6 +1,3 @@
-// set window title
-document.title = "Kiezatlas ${project.version} / " + document.title
-
 function kiezatlas_plugin() {
 
     dm4c.register_css_stylesheet("/de.deepamehta.kiezatlas/style/kiezatlas.css")
@@ -20,6 +17,8 @@ function kiezatlas_plugin() {
     // === Webclient Listeners ===
 
     dm4c.register_listener("init", function() {
+        // set window title
+        document.title = "Kiezatlas ${project.version} / " + document.title
         // site launcher ### TODO: not yet functional
         var match = location.pathname.match(/\/site\/(.+)/)
         if (match) {
@@ -99,15 +98,7 @@ function kiezatlas_plugin() {
         }
         //
         var facet_types = dm4c.restc.get_facet_types(website.id).items
-        for (var i = 0; i < facet_types.length; i++) {
-            var facet_type = dm4c.get_topic_type(facet_types[i].uri)
-            var assoc_def = facet_type.assoc_defs[0]
-            var topic_type = dm4c.get_topic_type(assoc_def.part_topic_type_uri)
-            var field_uri = dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.uri
-            var value_topic = topic.composite[assoc_def.uri]
-            var fields = TopicRenderer.create_fields(topic_type, assoc_def, field_uri, value_topic, topic, setting)
-            page_model[assoc_def.uri] = fields
-        }
+        dm4c.get_plugin("facets_plugin").add_facets_to_page_model(topic, facet_types, page_model, setting)
     }
 
     function create_show_all_button() {
