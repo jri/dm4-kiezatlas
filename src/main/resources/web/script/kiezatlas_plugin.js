@@ -1,6 +1,6 @@
 function kiezatlas_plugin() {
 
-    dm4c.register_css_stylesheet("/de.deepamehta.kiezatlas/style/kiezatlas.css")
+    dm4c.load_stylesheet("/de.deepamehta.kiezatlas/style/kiezatlas.css")
 
     // === REST Client Extension ===
 
