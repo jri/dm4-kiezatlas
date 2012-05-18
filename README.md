@@ -43,6 +43,7 @@ Version History
 
 * Creating thematic Kiezatlas websites: geomaps presenting geo objects.
 * For each website: define which facets of the geo objects are presented respectively.
+* Compatible with DeepaMehta 4.0.7
 
 
 ------------

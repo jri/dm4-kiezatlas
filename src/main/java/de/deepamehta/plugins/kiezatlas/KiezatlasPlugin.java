@@ -50,7 +50,7 @@ public class KiezatlasPlugin extends Plugin {
 
     // Website-Geomap association
     private static final String WEBSITE_GEOMAP = "dm4.core.association";
-    private static final String ROLE_TYPE_WEBSITE = "dm4.core.default";
+    private static final String ROLE_TYPE_WEBSITE = "dm4.core.default";     // Note: used for both associations
     private static final String ROLE_TYPE_GEOMAP = "dm4.core.default";
     // Website-Facet Types association
     private static final String WEBSITE_FACET_TYPES = "dm4.core.association";

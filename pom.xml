@@ -7,31 +7,31 @@
     <name>DeepaMehta 4 Kiezatlas</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-kiezatlas</artifactId>
-    <version>2.0</version>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-parent</artifactId>
         <version>2</version>
-        <relativePath>../deepamehta-parent/pom.xml</relativePath>
+        <relativePath>../../modules/dm4-parent/pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
-            <version>4.0.7</version>
+            <version>4.0.11-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-geomaps</artifactId>
-            <version>0.2</version>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-facets</artifactId>
-            <version>0.2</version>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

@@ -76,6 +76,10 @@ function kiezatlas_plugin() {
 
     /**
      * Extends the page model by the website-specific facets.
+     *
+     * @param   topic       the topic to be rendered.
+     * @param   page_model  the page model to be extended.
+     * @param   setting     "viewable" or "editable" (string).
      */
     function extend_page(topic, page_model, setting) {
         // If we're not a geo object we display no facets
