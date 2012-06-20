@@ -154,7 +154,7 @@ public class KiezatlasPlugin extends Plugin {
     // ---
 
     @Override
-    public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
+    public void preSendTopicHook(Topic topic, ClientState clientState) {
         if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
             return;
         }

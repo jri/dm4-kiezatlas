@@ -13,15 +13,15 @@ public class Application extends javax.ws.rs.core.Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        Set classes = new HashSet();
+        Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(JSONEnabledProvider.class);
         classes.add(JSONEnabledCollectionProvider.class);
         return classes;
     }
 
     @Override
-    public Set getSingletons() {
-        Set singletons = new HashSet();
+    public Set<Object> getSingletons() {
+        Set<Object> singletons = new HashSet<Object>();
         singletons.add(Activator.getService().getPlugin("de.deepamehta.kiezatlas"));
         return singletons;
     }
