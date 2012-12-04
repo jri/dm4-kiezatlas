@@ -1,7 +1,5 @@
 package de.deepamehta.plugins.kiezatlas;
 
-import de.deepamehta.plugins.geomaps.model.Geomap;
-import de.deepamehta.plugins.geomaps.model.GeomapTopic;
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
@@ -15,10 +13,13 @@ import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.annotation.ConsumesService;
+import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreSendTopicListener;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -41,10 +42,10 @@ import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/site")
 @Consumes("application/json")
 @Produces("application/json")
-public class KiezatlasPlugin extends Plugin {
+public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicListener, PreSendTopicListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -125,15 +126,18 @@ public class KiezatlasPlugin extends Plugin {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // ****************************
+    // *** Hook Implementations ***
+    // ****************************
 
 
 
     @Override
+    @ConsumesService({
+        "de.deepamehta.plugins.geomaps.service.GeomapsService",
+        "de.deepamehta.plugins.facets.service.FacetsService"
+    })
     public void serviceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
         if (service instanceof GeomapsService) {
             geomapsService = (GeomapsService) service;
         } else if (service instanceof FacetsService) {
@@ -143,7 +147,6 @@ public class KiezatlasPlugin extends Plugin {
 
     @Override
     public void serviceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
         if (service == geomapsService) {
             geomapsService = null;
         } else if (service == facetsService) {
@@ -151,10 +154,16 @@ public class KiezatlasPlugin extends Plugin {
         }
     }
 
-    // ---
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
+
+
 
     @Override
-    public void preSendTopicHook(Topic topic, ClientState clientState) {
+    public void preSendTopic(Topic topic, ClientState clientState) {
         if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
             return;
         }
@@ -181,8 +190,8 @@ public class KiezatlasPlugin extends Plugin {
     }
 
     @Override
-    public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                      Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
+                                                                                       Directives directives) {
         if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
             return;
         }
@@ -243,13 +252,13 @@ public class KiezatlasPlugin extends Plugin {
 
     private boolean isGeomap(long topicmapId) {
         Topic topicmap = dms.getTopic(topicmapId, true, null);
-        String rendererUri = topicmap.getCompositeValue().getString("dm4.topicmaps.canvas_renderer_uri");
+        String rendererUri = topicmap.getCompositeValue().getString("dm4.topicmaps.topicmap_renderer_uri");
         return rendererUri.equals("dm4.geomaps.geomap_renderer");
     }
 
     // ### FIXME: there is a copy in FacetsPlugin.java
     private AssociationDefinition getAssocDef(String facetTypeUri) {
         // Note: a facet type has exactly *one* association definition
-        return dms.getTopicType(facetTypeUri, null).getAssocDefs().values().iterator().next();
+        return dms.getTopicType(facetTypeUri, null).getAssocDefs().iterator().next();
     }
 }

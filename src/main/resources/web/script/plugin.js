@@ -1,6 +1,4 @@
-function kiezatlas_plugin() {
-
-    dm4c.load_stylesheet("/de.deepamehta.kiezatlas/style/kiezatlas.css")
+dm4c.add_plugin("de.deepamehta.kiezatlas", function() {
 
     // === REST Client Extension ===
 
@@ -16,7 +14,7 @@ function kiezatlas_plugin() {
 
     // === Webclient Listeners ===
 
-    dm4c.register_listener("init", function() {
+    dm4c.add_listener("init", function() {
         // set window title
         document.title = "Kiezatlas ${project.version} / " + document.title
         // site launcher ### TODO: not yet functional
@@ -26,19 +24,19 @@ function kiezatlas_plugin() {
         }
     })
 
-    dm4c.register_listener("pre_render_page", function(topic, page_model) {
-        extend_page(topic, page_model, "viewable")
+    dm4c.add_listener("pre_render_page", function(topic, page_model) {
+        extend_page(topic, page_model, dm4c.render.page_model.mode.INFO)
         // display "Show All" button
         if (is_geomap(get_topicmap())) {
             create_show_all_button()
         }
     })
 
-    dm4c.register_listener("pre_render_form", function(topic, page_model) {
-        extend_page(topic, page_model, "editable")
+    dm4c.add_listener("pre_render_form", function(topic, page_model) {
+        extend_page(topic, page_model, dm4c.render.page_model.mode.FORM)
     })
 
-    dm4c.register_listener("default_page_rendering", function() {
+    dm4c.add_listener("default_page_rendering", function() {
         var topicmap = get_topicmap()
         // If we're not on a geomap we display no list
         if (!is_geomap(topicmap)) {
@@ -53,7 +51,7 @@ function kiezatlas_plugin() {
         return false    // suppress webclient's default rendering (splash screen)
 
         function click_handler(topic) {
-            var geo_facet = dm4c.get_plugin("geomaps_plugin").get_geo_facet(topic)
+            var geo_facet = dm4c.get_plugin("de.deepamehta.geomaps").get_geo_facet(topic)
             // alert("topic=" + JSON.stringify(topic) + "\n\ngeo_facet=" + JSON.stringify(geo_facet))
             dm4c.do_select_topic(geo_facet.id)
         }
@@ -77,11 +75,12 @@ function kiezatlas_plugin() {
     /**
      * Extends the page model by the website-specific facets.
      *
-     * @param   topic       the topic to be rendered.
-     * @param   page_model  the page model to be extended.
-     * @param   setting     "viewable" or "editable" (string).
+     * @param   topic           the topic to be rendered.
+     * @param   page_model      the page model to be extended.
+     * @param   render_mode     dm4c.render.page_model.mode.INFO or
+     *                          dm4c.render.page_model.mode.FORM
      */
-    function extend_page(topic, page_model, setting) {
+    function extend_page(topic, page_model, render_mode) {
         // If we're not a geo object we display no facets
         if (topic.type_uri != "dm4.kiezatlas.geo_object") {
             return
@@ -102,7 +101,7 @@ function kiezatlas_plugin() {
         }
         //
         var facet_types = dm4c.restc.get_facet_types(website.id).items
-        dm4c.get_plugin("facets_plugin").add_facets_to_page_model(topic, facet_types, page_model, setting)
+        dm4c.get_plugin("de.deepamehta.facets").add_facets_to_page_model(topic, facet_types, page_model, render_mode)
     }
 
     function create_show_all_button() {
@@ -117,10 +116,10 @@ function kiezatlas_plugin() {
     // ---
 
     function get_topicmap() {
-        return dm4c.get_plugin("topicmaps_plugin").get_topicmap()
+        return dm4c.get_plugin("de.deepamehta.topicmaps").get_topicmap()
     }
 
     function is_geomap(topicmap) {
         return topicmap.get_renderer_uri() == "dm4.geomaps.geomap_renderer"
     }
-}
+})

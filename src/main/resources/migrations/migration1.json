@@ -15,12 +15,12 @@
             data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.kiezatlas.geo_object_name",
+                    part_type_uri:        "dm4.kiezatlas.geo_object_name",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 },
                 {
-                    part_topic_type_uri:  "dm4.contacts.address",
+                    part_type_uri:        "dm4.contacts.address",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
@@ -50,7 +50,7 @@
             data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.kiezatlas.website_title",
+                    part_type_uri:        "dm4.kiezatlas.website_title",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
