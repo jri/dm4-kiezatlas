@@ -167,26 +167,13 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
             return;
         }
+        //
         ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
         if (facetTypes == null) {
             return;
         }
         //
-        for (Topic facetType : facetTypes) {
-            String facetTypeUri = facetType.getUri();
-            Topic facet = facetsService.getFacet(topic, facetTypeUri);
-            // Note: facet is null in 2 cases:
-            // 1) The geo object has just been created (no update yet)
-            // 2) The geo object has been created inside a non-geomap and then being revealed inside a geomap.
-            if (facet != null) {
-                logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri +
-                    "\" facet (" + facet + ")");
-                topic.getCompositeValue().put(facet.getTypeUri(), facet.getModel());
-            } else {
-                logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri +
-                    "\" facet ABORTED -- no such facet in DB");
-            }
-        }
+        enrichWithFacets(topic, facetTypes);
     }
 
     @Override
@@ -195,27 +182,100 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
             return;
         }
+        //
         ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
         if (facetTypes == null) {
             return;
         }
         //
+        updateFacets(topic, facetTypes, newModel, clientState, directives);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+
+    // === Enrich with facets ===
+
+    private void enrichWithFacets(Topic topic, ResultSet<RelatedTopic> facetTypes) {
         for (Topic facetType : facetTypes) {
             String facetTypeUri = facetType.getUri();
-            String assocDefUri = getAssocDef(facetTypeUri).getUri();
-            TopicModel facet = newModel.getCompositeValue().getTopic(assocDefUri);
-            logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
-                " (facet=" + facet + ")");
-            facetsService.updateFacet(topic, facetTypeUri, facet, clientState, directives);
+            String cardinalityUri = getAssocDef(facetTypeUri).getPartCardinalityUri();
+            if (cardinalityUri.equals("dm4.core.one")) {
+                enrichWithSingleFacet(topic, facetTypeUri);
+            } else if (cardinalityUri.equals("dm4.core.many")) {
+                enrichWithMultiFacet(topic, facetTypeUri);
+            } else {
+                throw new RuntimeException("\"" + cardinalityUri + "\" is an unsupported cardinality URI");
+            }
+        }
+    }
+
+    // ---
+
+    private void enrichWithSingleFacet(Topic topic, String facetTypeUri) {
+        Topic facet = facetsService.getFacet(topic, facetTypeUri);
+        // Note: facet is null in 2 cases:
+        // 1) The geo object has just been created (no update yet)
+        // 2) The geo object has been created outside a geomap and then being revealed in a geomap.
+        if (facet == null) {
+            logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri + "\" facet " +
+                "ABORTED -- no such facet in DB");
+            return;
+        }
+        //
+        logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri + "\" facet (" +
+            facet + ")");
+        topic.getCompositeValue().put(facet.getTypeUri(), facet.getModel());
+    }
+
+    private void enrichWithMultiFacet(Topic topic, String facetTypeUri) {
+        Set<RelatedTopic> facets = facetsService.getFacets(topic, facetTypeUri);
+        logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri + "\" facets (" +
+            facets + ")");
+        for (Topic facet : facets) {
+            topic.getCompositeValue().add(facet.getTypeUri(), facet.getModel());
         }
     }
 
 
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // === Update facets ===
+
+    private void updateFacets(Topic topic, ResultSet<RelatedTopic> facetTypes, TopicModel newModel,
+                                                                       ClientState clientState, Directives directives) {
+        for (Topic facetType : facetTypes) {
+            String facetTypeUri = facetType.getUri();
+            AssociationDefinition assocDef = getAssocDef(facetTypeUri);
+            String assocDefUri = assocDef.getUri();
+            String cardinalityUri = assocDef.getPartCardinalityUri();
+            if (cardinalityUri.equals("dm4.core.one")) {
+                TopicModel facetValue = newModel.getCompositeValue().getTopic(assocDefUri);
+                logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
+                    " (facetValue=" + facetValue + ")");
+                facetsService.updateFacet(topic, facetTypeUri, facetValue, clientState, directives);
+            } else if (cardinalityUri.equals("dm4.core.many")) {
+                List<TopicModel> facetValues = newModel.getCompositeValue().getTopics(assocDefUri);
+                logger.info("### Storing facets of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
+                    " (facetValues=" + facetValues + ")");
+                facetsService.updateFacets(topic, facetTypeUri, facetValues, clientState, directives);
+            } else {
+                throw new RuntimeException("\"" + cardinalityUri + "\" is an unsupported cardinality URI");
+            }
+        }
+    }
+
+
+
+    // === Helper ===
 
     /**
-     * Finds the geo object facet types for the selected topicmap.
+     * Determines the facet types of the selected topicmap.
+     *
+     * @return  The facet types (as a result set, may be empty), or <code>null</code> if
+     *              a) the selected topicmap is not a geomap, or
+     *              b) the geomap is not associated to a Kiezatlas Website.
      */
     private ResultSet<RelatedTopic> getFacetTypes(ClientState clientState) {
         long topicmapId = clientState.getLong("dm4_topicmap_id");
