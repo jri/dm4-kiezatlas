@@ -3,16 +3,11 @@ package de.deepamehta.plugins.kiezatlas;
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
@@ -33,10 +28,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -132,10 +125,15 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
 
 
+    /**
+     * Note: we *wait* for the Access Control service but we don't actually *consume* it.
+     * This ensures the Kiezatlas types are properly setup for Access Control.
+     */
     @Override
     @ConsumesService({
         "de.deepamehta.plugins.geomaps.service.GeomapsService",
-        "de.deepamehta.plugins.facets.service.FacetsService"
+        "de.deepamehta.plugins.facets.service.FacetsService",
+        "de.deepamehta.plugins.accesscontrol.service.AccessControlService"
     })
     public void serviceArrived(PluginService service) {
         if (service instanceof GeomapsService) {
@@ -248,7 +246,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         for (Topic facetType : facetTypes) {
             String facetTypeUri = facetType.getUri();
             AssociationDefinition assocDef = getAssocDef(facetTypeUri);
-            String assocDefUri = assocDef.getUri();
+            String assocDefUri = assocDef.getPartTypeUri();
             String cardinalityUri = assocDef.getPartCardinalityUri();
             if (cardinalityUri.equals("dm4.core.one")) {
                 TopicModel facetValue = newModel.getCompositeValue().getTopic(assocDefUri);

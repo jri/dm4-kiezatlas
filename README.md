@@ -9,27 +9,19 @@ A rewrite of Kiezatlas 1.6.
 Requirements
 ------------
 
-* A DeepaMehta 4.0.11 installation  
+* A DeepaMehta 4.0.13 installation  
   <https://github.com/jri/deepamehta>
-
-* Plugin DM4 Facets 0.3  
-  <https://github.com/jri/dm4-facets>
-
-* Plugin DM4 Geomaps 0.3  
-  <https://github.com/jri/dm4-geomaps>
 
 
 Installation
 ------------
 
-1. Install the DM4 Facets and DM4 Geomaps plugins. See links above.
+1. Download the DM4 Kiezatlas plugin:  
+   <http://deepamehta.newthinking.net/maven2/de/deepamehta/deepamehta-kiezatlas/2.1/deepamehta-kiezatlas-2.1.jar>
 
-2. Download the DM4 Kiezatlas plugin:  
-   <http://deepamehta.newthinking.net/maven2/de/deepamehta/deepamehta-kiezatlas/2.0.1/deepamehta-kiezatlas-2.0.1.jar>
+2. Move the DM4 Kiezatlas plugin to the `deepamehta-4.0.13/bundle` folder.
 
-3. Move the DM4 Kiezatlas plugin to the `deepamehta-4.0.11/bundle` folder.
-
-4. Restart DeepaMehta.
+3. Restart DeepaMehta.
 
 
 Usage
@@ -38,6 +30,10 @@ Usage
 
 Version History
 ---------------
+
+**2.1** -- Jan ?, 2013 (not released)
+
+* Compatible with DeepaMehta 4.0.13
 
 **2.0.1** -- May 19, 2012
 
@@ -52,4 +48,4 @@ Version History
 
 ------------
 Jörg Richter  
-May 19, 2012
+Jan 11, 2013
