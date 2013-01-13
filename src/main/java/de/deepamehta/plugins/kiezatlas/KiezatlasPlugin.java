@@ -1,24 +1,20 @@
 package de.deepamehta.plugins.kiezatlas;
 
-import de.deepamehta.plugins.geomaps.model.Geomap;
-import de.deepamehta.plugins.geomaps.model.GeomapTopic;
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.annotation.ConsumesService;
+import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreSendTopicListener;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -32,19 +28,17 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 
 
-@Path("/")
+@Path("/site")
 @Consumes("application/json")
 @Produces("application/json")
-public class KiezatlasPlugin extends Plugin {
+public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicListener, PreSendTopicListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -125,15 +119,23 @@ public class KiezatlasPlugin extends Plugin {
 
 
 
-    // **************************************************
-    // *** Core Hooks (called from DeepaMehta 4 Core) ***
-    // **************************************************
+    // ****************************
+    // *** Hook Implementations ***
+    // ****************************
 
 
 
+    /**
+     * Note: we *wait* for the Access Control service but we don't actually *consume* it.
+     * This ensures the Kiezatlas types are properly setup for Access Control.
+     */
     @Override
+    @ConsumesService({
+        "de.deepamehta.plugins.geomaps.service.GeomapsService",
+        "de.deepamehta.plugins.facets.service.FacetsService",
+        "de.deepamehta.plugins.accesscontrol.service.AccessControlService"
+    })
     public void serviceArrived(PluginService service) {
-        logger.info("########## Service arrived: " + service);
         if (service instanceof GeomapsService) {
             geomapsService = (GeomapsService) service;
         } else if (service instanceof FacetsService) {
@@ -143,7 +145,6 @@ public class KiezatlasPlugin extends Plugin {
 
     @Override
     public void serviceGone(PluginService service) {
-        logger.info("########## Service gone: " + service);
         if (service == geomapsService) {
             geomapsService = null;
         } else if (service == facetsService) {
@@ -151,62 +152,128 @@ public class KiezatlasPlugin extends Plugin {
         }
     }
 
-    // ---
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
+
+
 
     @Override
-    public void postFetchTopicHook(Topic topic, ClientState clientState, Directives directives) {
+    public void preSendTopic(Topic topic, ClientState clientState) {
         if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
             return;
         }
+        //
         ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
         if (facetTypes == null) {
             return;
         }
         //
+        enrichWithFacets(topic, facetTypes);
+    }
+
+    @Override
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
+                                                                                       Directives directives) {
+        if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
+            return;
+        }
+        //
+        ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
+        if (facetTypes == null) {
+            return;
+        }
+        //
+        updateFacets(topic, facetTypes, newModel, clientState, directives);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+
+    // === Enrich with facets ===
+
+    private void enrichWithFacets(Topic topic, ResultSet<RelatedTopic> facetTypes) {
         for (Topic facetType : facetTypes) {
             String facetTypeUri = facetType.getUri();
-            Topic facet = facetsService.getFacet(topic, facetTypeUri);
-            // Note: facet is null in 2 cases:
-            // 1) The geo object has just been created (no update yet)
-            // 2) The geo object has been created inside a non-geomap and then being revealed inside a geomap.
-            if (facet != null) {
-                logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri +
-                    "\" facet (" + facet + ")");
-                topic.getCompositeValue().put(facet.getTypeUri(), facet.getModel());
+            String cardinalityUri = getAssocDef(facetTypeUri).getPartCardinalityUri();
+            if (cardinalityUri.equals("dm4.core.one")) {
+                enrichWithSingleFacet(topic, facetTypeUri);
+            } else if (cardinalityUri.equals("dm4.core.many")) {
+                enrichWithMultiFacet(topic, facetTypeUri);
             } else {
-                logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri +
-                    "\" facet ABORTED -- no such facet in DB");
+                throw new RuntimeException("\"" + cardinalityUri + "\" is an unsupported cardinality URI");
             }
         }
     }
 
-    @Override
-    public void postUpdateHook(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                      Directives directives) {
-        if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
-            return;
-        }
-        ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
-        if (facetTypes == null) {
+    // ---
+
+    private void enrichWithSingleFacet(Topic topic, String facetTypeUri) {
+        Topic facet = facetsService.getFacet(topic, facetTypeUri);
+        // Note: facet is null in 2 cases:
+        // 1) The geo object has just been created (no update yet)
+        // 2) The geo object has been created outside a geomap and then being revealed in a geomap.
+        if (facet == null) {
+            logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri + "\" facet " +
+                "ABORTED -- no such facet in DB");
             return;
         }
         //
-        for (Topic facetType : facetTypes) {
-            String facetTypeUri = facetType.getUri();
-            String assocDefUri = getAssocDef(facetTypeUri).getUri();
-            TopicModel facet = newModel.getCompositeValue().getTopic(assocDefUri);
-            logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
-                " (facet=" + facet + ")");
-            facetsService.updateFacet(topic, facetTypeUri, facet, clientState, directives);
+        logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri + "\" facet (" +
+            facet + ")");
+        topic.getCompositeValue().put(facet.getTypeUri(), facet.getModel());
+    }
+
+    private void enrichWithMultiFacet(Topic topic, String facetTypeUri) {
+        Set<RelatedTopic> facets = facetsService.getFacets(topic, facetTypeUri);
+        logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri + "\" facets (" +
+            facets + ")");
+        for (Topic facet : facets) {
+            topic.getCompositeValue().add(facet.getTypeUri(), facet.getModel());
         }
     }
 
 
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // === Update facets ===
+
+    private void updateFacets(Topic topic, ResultSet<RelatedTopic> facetTypes, TopicModel newModel,
+                                                                       ClientState clientState, Directives directives) {
+        for (Topic facetType : facetTypes) {
+            String facetTypeUri = facetType.getUri();
+            AssociationDefinition assocDef = getAssocDef(facetTypeUri);
+            String assocDefUri = assocDef.getPartTypeUri();
+            String cardinalityUri = assocDef.getPartCardinalityUri();
+            if (cardinalityUri.equals("dm4.core.one")) {
+                TopicModel facetValue = newModel.getCompositeValue().getTopic(assocDefUri);
+                logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
+                    " (facetValue=" + facetValue + ")");
+                facetsService.updateFacet(topic, facetTypeUri, facetValue, clientState, directives);
+            } else if (cardinalityUri.equals("dm4.core.many")) {
+                List<TopicModel> facetValues = newModel.getCompositeValue().getTopics(assocDefUri);
+                logger.info("### Storing facets of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
+                    " (facetValues=" + facetValues + ")");
+                facetsService.updateFacets(topic, facetTypeUri, facetValues, clientState, directives);
+            } else {
+                throw new RuntimeException("\"" + cardinalityUri + "\" is an unsupported cardinality URI");
+            }
+        }
+    }
+
+
+
+    // === Helper ===
 
     /**
-     * Finds the geo object facet types for the selected topicmap.
+     * Determines the facet types of the selected topicmap.
+     *
+     * @return  The facet types (as a result set, may be empty), or <code>null</code> if
+     *              a) the selected topicmap is not a geomap, or
+     *              b) the geomap is not associated to a Kiezatlas Website.
      */
     private ResultSet<RelatedTopic> getFacetTypes(ClientState clientState) {
         long topicmapId = clientState.getLong("dm4_topicmap_id");
@@ -243,13 +310,13 @@ public class KiezatlasPlugin extends Plugin {
 
     private boolean isGeomap(long topicmapId) {
         Topic topicmap = dms.getTopic(topicmapId, true, null);
-        String rendererUri = topicmap.getCompositeValue().getString("dm4.topicmaps.canvas_renderer_uri");
+        String rendererUri = topicmap.getCompositeValue().getString("dm4.topicmaps.topicmap_renderer_uri");
         return rendererUri.equals("dm4.geomaps.geomap_renderer");
     }
 
     // ### FIXME: there is a copy in FacetsPlugin.java
     private AssociationDefinition getAssocDef(String facetTypeUri) {
         // Note: a facet type has exactly *one* association definition
-        return dms.getTopicType(facetTypeUri, null).getAssocDefs().values().iterator().next();
+        return dms.getTopicType(facetTypeUri, null).getAssocDefs().iterator().next();
     }
 }

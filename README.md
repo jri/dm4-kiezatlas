@@ -9,47 +9,48 @@ A rewrite of Kiezatlas 1.6.
 Requirements
 ------------
 
-* A DeepaMehta 4.0.11 installation  
+* A DeepaMehta 4.0.13 installation  
   <https://github.com/jri/deepamehta>
-
-* Plugin DM4 Facets 0.3  
-  <https://github.com/jri/dm4-facets>
-
-* Plugin DM4 Geomaps 0.3  
-  <https://github.com/jri/dm4-geomaps>
 
 
 Installation
 ------------
 
-1. Install the DM4 Facets and DM4 Geomaps plugins. See links above.
+1. Download the DM4 Kiezatlas plugin:  
+   <http://deepamehta.newthinking.net/maven2/de/deepamehta/deepamehta-kiezatlas/2.1/deepamehta-kiezatlas-2.1.jar>
 
-2. Download the DM4 Kiezatlas plugin:  
-   <http://deepamehta.newthinking.net/maven2/de/deepamehta/deepamehta-kiezatlas/2.0.1/deepamehta-kiezatlas-2.0.1.jar>
+2. Move the DM4 Kiezatlas plugin to the `deepamehta-4.0.13/bundle` folder.
 
-3. Move the DM4 Kiezatlas plugin to the `deepamehta-4.0.11/bundle` folder.
-
-4. Restart DeepaMehta.
+3. Restart DeepaMehta.
 
 
 Usage
 -----
 
+* Create a Kiezatlas Website and associate it to a Geomap.
+* Create Facet types and associate them to a Kiezatlas Website.
+
 
 Version History
 ---------------
+
+**2.1** -- Jan 13, 2013
+
+* Basic Access Control with 2 Roles: Admin and User.
+* Categorization of Geo Objects via multiple-selectable category systems.
+* Compatible with DeepaMehta 4.0.13
 
 **2.0.1** -- May 19, 2012
 
 * Compatible with DeepaMehta 4.0.11
 
-**2.0** -- Jan 19, 2011
+**2.0** -- Jan 19, 2012
 
-* Creating thematic Kiezatlas websites: geomaps presenting geo objects.
-* For each website: define which facets of the geo objects are presented respectively.
+* Create thematic Kiezatlas Websites: geomaps presenting geo objects.
+* Configure which geo object facets are presented at which Kiezatlas Website.
 * Compatible with DeepaMehta 4.0.7
 
 
 ------------
 Jörg Richter  
-May 19, 2012
+Jan 13, 2013
