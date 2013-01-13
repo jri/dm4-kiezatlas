@@ -27,25 +27,30 @@ Installation
 Usage
 -----
 
+* Create a Kiezatlas Website and associate it to a Geomap.
+* Create Facet types and associate them to a Kiezatlas Website.
+
 
 Version History
 ---------------
 
-**2.1** -- Jan ?, 2013 (not released)
+**2.1** -- Jan 13, 2013
 
+* Basic Access Control with 2 Roles: Admin and User.
+* Categorization of Geo Objects via multiple-selectable category systems.
 * Compatible with DeepaMehta 4.0.13
 
 **2.0.1** -- May 19, 2012
 
 * Compatible with DeepaMehta 4.0.11
 
-**2.0** -- Jan 19, 2011
+**2.0** -- Jan 19, 2012
 
-* Creating thematic Kiezatlas websites: geomaps presenting geo objects.
-* For each website: define which facets of the geo objects are presented respectively.
+* Create thematic Kiezatlas Websites: geomaps presenting geo objects.
+* Configure which geo object facets are presented at which Kiezatlas Website.
 * Compatible with DeepaMehta 4.0.7
 
 
 ------------
 Jörg Richter  
-Jan 11, 2013
+Jan 13, 2013
