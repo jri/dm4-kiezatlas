@@ -34,6 +34,10 @@ Usage
 Version History
 ---------------
 
+**2.1.1** -- upcoming
+
+* Compatible with DeepaMehta 4.1
+
 **2.1** -- Jan 13, 2013
 
 * Basic Access Control with 2 Roles: Admin and User.
@@ -53,4 +57,4 @@ Version History
 
 ------------
 Jörg Richter  
-Jan 13, 2013
+Mar 1, 2013

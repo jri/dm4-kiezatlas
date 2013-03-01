@@ -199,7 +199,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     private void enrichWithFacets(Topic topic, ResultSet<RelatedTopic> facetTypes) {
         for (Topic facetType : facetTypes) {
             String facetTypeUri = facetType.getUri();
-            String cardinalityUri = getAssocDef(facetTypeUri).getPartCardinalityUri();
+            String cardinalityUri = getAssocDef(facetTypeUri).getChildCardinalityUri();
             if (cardinalityUri.equals("dm4.core.one")) {
                 enrichWithSingleFacet(topic, facetTypeUri);
             } else if (cardinalityUri.equals("dm4.core.many")) {
@@ -225,7 +225,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         //
         logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri + "\" facet (" +
             facet + ")");
-        topic.getCompositeValue().put(facet.getTypeUri(), facet.getModel());
+        topic.getCompositeValue().getModel().put(facet.getTypeUri(), facet.getModel());
     }
 
     private void enrichWithMultiFacet(Topic topic, String facetTypeUri) {
@@ -233,7 +233,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri + "\" facets (" +
             facets + ")");
         for (Topic facet : facets) {
-            topic.getCompositeValue().add(facet.getTypeUri(), facet.getModel());
+            topic.getCompositeValue().getModel().add(facet.getTypeUri(), facet.getModel());
         }
     }
 
@@ -246,15 +246,15 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         for (Topic facetType : facetTypes) {
             String facetTypeUri = facetType.getUri();
             AssociationDefinition assocDef = getAssocDef(facetTypeUri);
-            String assocDefUri = assocDef.getPartTypeUri();
-            String cardinalityUri = assocDef.getPartCardinalityUri();
+            String assocDefUri = assocDef.getChildTypeUri();
+            String cardinalityUri = assocDef.getChildCardinalityUri();
             if (cardinalityUri.equals("dm4.core.one")) {
-                TopicModel facetValue = newModel.getCompositeValue().getTopic(assocDefUri);
+                TopicModel facetValue = newModel.getCompositeValueModel().getTopic(assocDefUri);
                 logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
                     " (facetValue=" + facetValue + ")");
                 facetsService.updateFacet(topic, facetTypeUri, facetValue, clientState, directives);
             } else if (cardinalityUri.equals("dm4.core.many")) {
-                List<TopicModel> facetValues = newModel.getCompositeValue().getTopics(assocDefUri);
+                List<TopicModel> facetValues = newModel.getCompositeValueModel().getTopics(assocDefUri);
                 logger.info("### Storing facets of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
                     " (facetValues=" + facetValues + ")");
                 facetsService.updateFacets(topic, facetTypeUri, facetValues, clientState, directives);

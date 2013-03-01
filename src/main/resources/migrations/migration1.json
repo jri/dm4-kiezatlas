@@ -15,14 +15,14 @@
             data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.kiezatlas.geo_object_name",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.kiezatlas.geo_object_name",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 },
                 {
-                    part_type_uri:        "dm4.contacts.address",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.contacts.address",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ],
             view_config_topics: [
@@ -50,9 +50,9 @@
             data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
-                    part_type_uri:        "dm4.kiezatlas.website_title",
-                    part_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:       "dm4.core.composition_def"
+                    child_type_uri:        "dm4.kiezatlas.website_title",
+                    child_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ],
             view_config_topics: [
