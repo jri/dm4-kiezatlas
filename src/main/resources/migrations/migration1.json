@@ -30,7 +30,7 @@
                     type_uri: "dm4.webclient.view_config",
                     composite: {
                         dm4.webclient.icon: "/de.deepamehta.kiezatlas/images/info-purple.png",
-                        dm4.webclient.add_to_create_menu: true
+                        dm4.webclient.show_in_create_menu: true
                     }
                 }
             ]
@@ -60,7 +60,7 @@
                     type_uri: "dm4.webclient.view_config",
                     composite: {
                         dm4.webclient.icon: "/de.deepamehta.kiezatlas/images/info-blue.png",
-                        dm4.webclient.add_to_create_menu: true
+                        dm4.webclient.show_in_create_menu: true
                     }
                 }
             ]
