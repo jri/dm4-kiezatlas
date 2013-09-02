@@ -85,8 +85,8 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     @Path("/geomap/{geomap_id}")
     public Topic getWebsite(@PathParam("geomap_id") long geomapId) {
         try {
-            return dms.getTopic(geomapId, false, null).getRelatedTopic(WEBSITE_GEOMAP,
-                ROLE_TYPE_WEBSITE, ROLE_TYPE_GEOMAP, "dm4.kiezatlas.website", false, false, null);
+            return dms.getTopic(geomapId, false).getRelatedTopic(WEBSITE_GEOMAP, ROLE_TYPE_WEBSITE,
+                ROLE_TYPE_GEOMAP, "dm4.kiezatlas.website", false, false);
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Finding the geomap's website topic failed " +
                 "(geomapId=" + geomapId + ")", e));
@@ -97,8 +97,8 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     @Path("/{website_id}/facets")
     public ResultSet<RelatedTopic> getFacetTypes(@PathParam("website_id") long websiteId) {
         try {
-            return dms.getTopic(websiteId, false, null).getRelatedTopics(WEBSITE_FACET_TYPES,
-                ROLE_TYPE_WEBSITE, ROLE_TYPE_FACET_TYPE, "dm4.core.topic_type", false, false, 0, null);
+            return dms.getTopic(websiteId, false).getRelatedTopics(WEBSITE_FACET_TYPES, ROLE_TYPE_WEBSITE,
+                ROLE_TYPE_FACET_TYPE, "dm4.core.topic_type", false, false, 0);
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Finding the website's facet types failed " +
                 "(websiteId=" + websiteId + ")", e));
@@ -107,10 +107,9 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
     @GET
     @Path("/geomap/{geomap_id}/objects")
-    public Set<Topic> getGeoObjects(@PathParam("geomap_id") long geomapId,
-                                    @HeaderParam("Cookie") ClientState clientState) {
+    public Set<Topic> getGeoObjects(@PathParam("geomap_id") long geomapId) {
         try {
-            return fetchGeoObjects(geomapId, clientState);
+            return fetchGeoObjects(geomapId);
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException("Fetching the geomap's geo objects failed " +
                 "(geomapId=" + geomapId + ")", e));
@@ -294,11 +293,11 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         return getFacetTypes(website.getId());
     }
 
-    private Set<Topic> fetchGeoObjects(long geomapId, ClientState clientState) {
+    private Set<Topic> fetchGeoObjects(long geomapId) {
         Set<Topic> geoObjects = new HashSet();
         ResultSet<RelatedTopic> geomapTopics = geomapsService.getGeomapTopics(geomapId);
         for (RelatedTopic topic : geomapTopics) {
-            Topic geoTopic = geomapsService.getGeoTopic(topic.getId(), clientState);
+            Topic geoTopic = geomapsService.getGeoTopic(topic.getId());
             geoObjects.add(geoTopic);
             // ### TODO: optimization. Include only name and address in returned geo objects.
             // ### For the moment the entire objects are returned, including composite values and facets.
@@ -309,7 +308,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     // ---
 
     private boolean isGeomap(long topicmapId) {
-        Topic topicmap = dms.getTopic(topicmapId, true, null);
+        Topic topicmap = dms.getTopic(topicmapId, true);
         String rendererUri = topicmap.getCompositeValue().getString("dm4.topicmaps.topicmap_renderer_uri");
         return rendererUri.equals("dm4.geomaps.geomap_renderer");
     }
@@ -317,6 +316,6 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     // ### FIXME: there is a copy in FacetsPlugin.java
     private AssociationDefinition getAssocDef(String facetTypeUri) {
         // Note: a facet type has exactly *one* association definition
-        return dms.getTopicType(facetTypeUri, null).getAssocDefs().iterator().next();
+        return dms.getTopicType(facetTypeUri).getAssocDefs().iterator().next();
     }
 }
