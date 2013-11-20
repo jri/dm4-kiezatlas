@@ -52,7 +52,6 @@ dm4c.add_plugin("de.deepamehta.kiezatlas", function() {
 
         function click_handler(topic) {
             var geo_facet = dm4c.get_plugin("de.deepamehta.geomaps").get_geo_facet(topic)
-            // alert("topic=" + JSON.stringify(topic) + "\n\ngeo_facet=" + JSON.stringify(geo_facet))
             dm4c.do_select_topic(geo_facet.id)
         }
 

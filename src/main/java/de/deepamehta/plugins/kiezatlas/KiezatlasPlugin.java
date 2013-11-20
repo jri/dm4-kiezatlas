@@ -245,15 +245,15 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         for (Topic facetType : facetTypes) {
             String facetTypeUri = facetType.getUri();
             AssociationDefinition assocDef = getAssocDef(facetTypeUri);
-            String assocDefUri = assocDef.getChildTypeUri();
+            String childTypeUri = assocDef.getChildTypeUri();
             String cardinalityUri = assocDef.getChildCardinalityUri();
             if (cardinalityUri.equals("dm4.core.one")) {
-                TopicModel facetValue = newModel.getCompositeValueModel().getTopic(assocDefUri);
+                TopicModel facetValue = newModel.getCompositeValueModel().getTopic(childTypeUri);
                 logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
                     " (facetValue=" + facetValue + ")");
                 facetsService.updateFacet(topic, facetTypeUri, facetValue, clientState, directives);
             } else if (cardinalityUri.equals("dm4.core.many")) {
-                List<TopicModel> facetValues = newModel.getCompositeValueModel().getTopics(assocDefUri);
+                List<TopicModel> facetValues = newModel.getCompositeValueModel().getTopics(childTypeUri);
                 logger.info("### Storing facets of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
                     " (facetValues=" + facetValues + ")");
                 facetsService.updateFacets(topic, facetTypeUri, facetValues, clientState, directives);
