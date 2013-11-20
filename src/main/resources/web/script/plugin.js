@@ -51,8 +51,8 @@ dm4c.add_plugin("de.deepamehta.kiezatlas", function() {
         return false    // suppress webclient's default rendering (splash screen)
 
         function click_handler(topic) {
-            var geo_facet = dm4c.get_plugin("de.deepamehta.geomaps").get_geo_facet(topic)
-            dm4c.do_select_topic(geo_facet.id)
+            var geo_coordinate = dm4c.get_plugin("de.deepamehta.geomaps").get_geo_coordinate(topic)
+            dm4c.do_select_topic(geo_coordinate.id)
         }
 
         function render_handler(topic) {
