@@ -104,7 +104,7 @@ dm4c.add_plugin("de.deepamehta.kiezatlas", function() {
     }
 
     function create_show_all_button() {
-        var show_all_button = dm4c.ui.button(do_show_all, "Show All").attr("id", "ka-showall-button")
+        var show_all_button = dm4c.ui.button({on_click: do_show_all, label: "Show All"}).attr("id", "ka-showall-button")
         dm4c.render.page(show_all_button)
 
         function do_show_all() {
