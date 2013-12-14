@@ -5,13 +5,13 @@ import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
@@ -28,9 +28,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 
 import java.io.InputStream;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -95,7 +94,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
     @GET
     @Path("/{website_id}/facets")
-    public ResultSet<RelatedTopic> getFacetTypes(@PathParam("website_id") long websiteId) {
+    public ResultList<RelatedTopic> getFacetTypes(@PathParam("website_id") long websiteId) {
         try {
             return dms.getTopic(websiteId, false).getRelatedTopics(WEBSITE_FACET_TYPES, ROLE_TYPE_WEBSITE,
                 ROLE_TYPE_FACET_TYPE, "dm4.core.topic_type", false, false, 0);
@@ -107,7 +106,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
     @GET
     @Path("/geomap/{geomap_id}/objects")
-    public Set<Topic> getGeoObjects(@PathParam("geomap_id") long geomapId) {
+    public List<Topic> getGeoObjects(@PathParam("geomap_id") long geomapId) {
         try {
             return fetchGeoObjects(geomapId);
         } catch (Exception e) {
@@ -165,7 +164,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
             return;
         }
         //
-        ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
+        ResultList<RelatedTopic> facetTypes = getFacetTypes(clientState);
         if (facetTypes == null) {
             return;
         }
@@ -180,7 +179,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
             return;
         }
         //
-        ResultSet<RelatedTopic> facetTypes = getFacetTypes(clientState);
+        ResultList<RelatedTopic> facetTypes = getFacetTypes(clientState);
         if (facetTypes == null) {
             return;
         }
@@ -195,7 +194,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
     // === Enrich with facets ===
 
-    private void enrichWithFacets(Topic topic, ResultSet<RelatedTopic> facetTypes) {
+    private void enrichWithFacets(Topic topic, ResultList<RelatedTopic> facetTypes) {
         for (Topic facetType : facetTypes) {
             String facetTypeUri = facetType.getUri();
             String cardinalityUri = getAssocDef(facetTypeUri).getChildCardinalityUri();
@@ -228,7 +227,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     }
 
     private void enrichWithMultiFacet(Topic topic, String facetTypeUri) {
-        Set<RelatedTopic> facets = facetsService.getFacets(topic, facetTypeUri);
+        List<RelatedTopic> facets = facetsService.getFacets(topic, facetTypeUri);
         logger.info("### Enriching geo object " + topic.getId() + " with its \"" + facetTypeUri + "\" facets (" +
             facets + ")");
         for (Topic facet : facets) {
@@ -240,7 +239,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
     // === Update facets ===
 
-    private void updateFacets(Topic topic, ResultSet<RelatedTopic> facetTypes, TopicModel newModel,
+    private void updateFacets(Topic topic, ResultList<RelatedTopic> facetTypes, TopicModel newModel,
                                                                        ClientState clientState, Directives directives) {
         for (Topic facetType : facetTypes) {
             String facetTypeUri = facetType.getUri();
@@ -274,7 +273,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
      *              a) the selected topicmap is not a geomap, or
      *              b) the geomap is not associated to a Kiezatlas Website.
      */
-    private ResultSet<RelatedTopic> getFacetTypes(ClientState clientState) {
+    private ResultList<RelatedTopic> getFacetTypes(ClientState clientState) {
         long topicmapId = clientState.getLong("dm4_topicmap_id");
         //
         if (!isGeomap(topicmapId)) {
@@ -293,9 +292,9 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         return getFacetTypes(website.getId());
     }
 
-    private Set<Topic> fetchGeoObjects(long geomapId) {
-        Set<Topic> geoObjects = new HashSet();
-        ResultSet<RelatedTopic> geomapTopics = geomapsService.getGeomapTopics(geomapId);
+    private List<Topic> fetchGeoObjects(long geomapId) {
+        List<Topic> geoObjects = new ArrayList();
+        ResultList<RelatedTopic> geomapTopics = geomapsService.getGeomapTopics(geomapId);
         for (RelatedTopic topic : geomapTopics) {
             Topic geoTopic = geomapsService.getGeoTopic(topic.getId());
             geoObjects.add(geoTopic);
