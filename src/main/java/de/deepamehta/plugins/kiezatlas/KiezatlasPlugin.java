@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.kiezatlas;
 
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
+import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.AssociationDefinition;
@@ -250,12 +251,14 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
                 TopicModel facetValue = newModel.getCompositeValueModel().getTopic(childTypeUri);
                 logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
                     " (facetValue=" + facetValue + ")");
-                facetsService.updateFacet(topic, facetTypeUri, facetValue, clientState, directives);
+                FacetValue value = new FacetValue(childTypeUri).put(facetValue);
+                facetsService.updateFacet(topic, facetTypeUri, value, clientState, directives);
             } else if (cardinalityUri.equals("dm4.core.many")) {
                 List<TopicModel> facetValues = newModel.getCompositeValueModel().getTopics(childTypeUri);
                 logger.info("### Storing facets of type \"" + facetTypeUri + "\" for geo object " + topic.getId() +
                     " (facetValues=" + facetValues + ")");
-                facetsService.updateFacets(topic, facetTypeUri, facetValues, clientState, directives);
+                FacetValue value = new FacetValue(childTypeUri).addAll(facetValues);
+                facetsService.updateFacet(topic, facetTypeUri, value, clientState, directives);
             } else {
                 throw new RuntimeException("\"" + cardinalityUri + "\" is an unsupported cardinality URI");
             }
