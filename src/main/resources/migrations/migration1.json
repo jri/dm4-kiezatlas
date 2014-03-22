@@ -1,66 +1,66 @@
 {
-    topic_types: [
+    "topic_types": [
 
-        ### Geo Object ###
+        # Geo Object
 
         {
-            value:           "Name",
-            uri:             "ka2.geo_object.name",
-            data_type_uri:   "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            "value":           "Name",
+            "uri":             "ka2.geo_object.name",
+            "data_type_uri":   "dm4.core.text",
+            "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
-            value:           "Geo Object",
-            uri:             "ka2.geo_object",
-            data_type_uri:   "dm4.core.composite",
-            assoc_defs: [
+            "value":           "Geo Object",
+            "uri":             "ka2.geo_object",
+            "data_type_uri":   "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:        "ka2.geo_object.name",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "ka2.geo_object.name",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.contacts.address",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.contacts.address",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 }
             ],
-            view_config_topics: [
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    composite: {
-                        dm4.webclient.icon: "/de.deepamehta.kiezatlas/images/info-purple.png",
-                        dm4.webclient.show_in_create_menu: true
+                    "type_uri": "dm4.webclient.view_config",
+                    "composite": {
+                        "dm4.webclient.icon": "/de.deepamehta.kiezatlas/images/info-purple.png",
+                        "dm4.webclient.show_in_create_menu": true
                     }
                 }
             ]
         },
 
-        ### Kiezatlas Website ###
+        # Kiezatlas Website
 
         {
-            value:           "Title",
-            uri:             "ka2.website.title",
-            data_type_uri:   "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            "value":           "Title",
+            "uri":             "ka2.website.title",
+            "data_type_uri":   "dm4.core.text",
+            "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
-            value:           "Kiezatlas Website",
-            uri:             "ka2.website",
-            data_type_uri:   "dm4.core.composite",
-            assoc_defs: [
+            "value":           "Kiezatlas Website",
+            "uri":             "ka2.website",
+            "data_type_uri":   "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:        "ka2.website.title",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "ka2.website.title",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 }
             ],
-            view_config_topics: [
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    composite: {
-                        dm4.webclient.icon: "/de.deepamehta.kiezatlas/images/info-blue.png",
-                        dm4.webclient.show_in_create_menu: true
+                    "type_uri": "dm4.webclient.view_config",
+                    "composite": {
+                        "dm4.webclient.icon": "/de.deepamehta.kiezatlas/images/info-blue.png",
+                        "dm4.webclient.show_in_create_menu": true
                     }
                 }
             ]
