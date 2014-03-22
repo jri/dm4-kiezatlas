@@ -81,7 +81,7 @@ dm4c.add_plugin("de.deepamehta.kiezatlas", function() {
      */
     function extend_page(topic, page_model, render_mode) {
         // If we're not a geo object we display no facets
-        if (topic.type_uri != "dm4.kiezatlas.geo_object") {
+        if (topic.type_uri != "ka2.geo_object") {
             return
         }
         var topicmap = get_topicmap()

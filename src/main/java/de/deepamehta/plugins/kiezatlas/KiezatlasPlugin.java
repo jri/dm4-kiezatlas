@@ -85,7 +85,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     public Topic getWebsite(@PathParam("geomap_id") long geomapId) {
         try {
             return dms.getTopic(geomapId, false).getRelatedTopic(WEBSITE_GEOMAP, ROLE_TYPE_WEBSITE,
-                ROLE_TYPE_GEOMAP, "dm4.kiezatlas.website", false, false);
+                ROLE_TYPE_GEOMAP, "ka2.website", false, false);
         } catch (Exception e) {
             throw new RuntimeException("Finding the geomap's website topic failed (geomapId=" + geomapId + ")", e);
         }
@@ -157,7 +157,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
     @Override
     public void preSendTopic(Topic topic, ClientState clientState) {
-        if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
+        if (!topic.getTypeUri().equals("ka2.geo_object")) {
             return;
         }
         //
@@ -172,7 +172,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     @Override
     public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                        Directives directives) {
-        if (!topic.getTypeUri().equals("dm4.kiezatlas.geo_object")) {
+        if (!topic.getTypeUri().equals("ka2.geo_object")) {
             return;
         }
         //

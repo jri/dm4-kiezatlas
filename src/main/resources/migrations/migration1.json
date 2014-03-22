@@ -5,17 +5,17 @@
 
         {
             value:           "Name",
-            uri:             "dm4.kiezatlas.geo_object_name",
+            uri:             "ka2.geo_object.name",
             data_type_uri:   "dm4.core.text",
             index_mode_uris: ["dm4.core.fulltext"]
         },
         {
             value:           "Geo Object",
-            uri:             "dm4.kiezatlas.geo_object",
+            uri:             "ka2.geo_object",
             data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
-                    child_type_uri:        "dm4.kiezatlas.geo_object_name",
+                    child_type_uri:        "ka2.geo_object.name",
                     child_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:        "dm4.core.composition_def"
                 },
@@ -40,17 +40,17 @@
 
         {
             value:           "Title",
-            uri:             "dm4.kiezatlas.website_title",
+            uri:             "ka2.website.title",
             data_type_uri:   "dm4.core.text",
             index_mode_uris: ["dm4.core.fulltext"]
         },
         {
             value:           "Kiezatlas Website",
-            uri:             "dm4.kiezatlas.website",
+            uri:             "ka2.website",
             data_type_uri:   "dm4.core.composite",
             assoc_defs: [
                 {
-                    child_type_uri:        "dm4.kiezatlas.website_title",
+                    child_type_uri:        "ka2.website.title",
                     child_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:        "dm4.core.composition_def"
                 }
