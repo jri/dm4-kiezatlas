@@ -26,7 +26,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.WebApplicationException;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -73,11 +72,11 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     @Path("/{url}")
     @Produces("text/html")
     public InputStream launchWebclient() {
-        // Note: the template parameters are evaluated at client-side
         try {
+            // Note: the template parameters are evaluated at client-side
             return dms.getPlugin("de.deepamehta.webclient").getResourceAsStream("web/index.html");
         } catch (Exception e) {
-            throw new WebApplicationException(e);
+            throw new RuntimeException("Launching the webclient failed", e);
         }
     }
 
@@ -88,8 +87,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
             return dms.getTopic(geomapId, false).getRelatedTopic(WEBSITE_GEOMAP, ROLE_TYPE_WEBSITE,
                 ROLE_TYPE_GEOMAP, "dm4.kiezatlas.website", false, false);
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Finding the geomap's website topic failed " +
-                "(geomapId=" + geomapId + ")", e));
+            throw new RuntimeException("Finding the geomap's website topic failed (geomapId=" + geomapId + ")", e);
         }
     }
 
@@ -100,8 +98,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
             return dms.getTopic(websiteId, false).getRelatedTopics(WEBSITE_FACET_TYPES, ROLE_TYPE_WEBSITE,
                 ROLE_TYPE_FACET_TYPE, "dm4.core.topic_type", false, false, 0);
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Finding the website's facet types failed " +
-                "(websiteId=" + websiteId + ")", e));
+            throw new RuntimeException("Finding the website's facet types failed (websiteId=" + websiteId + ")", e);
         }
     }
 
@@ -111,8 +108,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         try {
             return fetchGeoObjects(geomapId);
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException("Fetching the geomap's geo objects failed " +
-                "(geomapId=" + geomapId + ")", e));
+            throw new RuntimeException("Fetching the geomap's geo objects failed (geomapId=" + geomapId + ")", e);
         }
     }
 
