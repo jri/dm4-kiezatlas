@@ -8,6 +8,7 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
@@ -24,11 +25,13 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -110,6 +113,33 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         } catch (Exception e) {
             throw new RuntimeException("Fetching the geomap's geo objects failed (geomapId=" + geomapId + ")", e);
         }
+    }
+
+    /**
+     * Finds all Geo Objects categorized by the specified category.
+     */
+    @GET
+    @Path("/category/{id}/objects")
+    public List<RelatedTopic> getGeoObjectsByCategory(@PathParam("id") long categoryId) {
+        return dms.getTopic(categoryId, false).getRelatedTopics("dm4.core.aggregation", "dm4.core.child",
+            "dm4.core.parent", "ka2.geo_object", false, false, 0).getItems();
+    }
+
+    /**
+     * Finds all categories that match the search term (case-insensitive substring search) and returns all geo objects
+     * of those categories, grouped by category.
+     */
+    @GET
+    @Path("/geoobject")
+    public SearchResult searchGeoObjects(@QueryParam("search") String searchTerm) {
+        SearchResult result = new SearchResult();
+        for (Topic criteria : getCriteria()) {
+            for (Topic category : dms.searchTopics("*" + searchTerm + "*", criteria.getUri())) {
+                List<RelatedTopic> geoObjects = getGeoObjectsByCategory(category.getId());
+                result.add(criteria, category, geoObjects);
+            }
+        }
+        return result;
     }
 
 
@@ -264,6 +294,24 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
 
     // === Helper ===
+
+    /**
+     * Returns all Kiezatlas ctriteria. A Kiezatlas ctriteria is a topic type whose URI starts with
+     * <code>ka2.criteria.</code> but does not end with <code>.facet</code>.
+     */
+    private List<Topic> getCriteria() {
+        List<Topic> criteria = dms.getTopics("uri", new SimpleValue("ka2.criteria.*"), false);
+        // remove facet types
+        Iterator<Topic> i = criteria.iterator();
+        while (i.hasNext()) {
+            Topic crit = i.next();
+            if (crit.getUri().endsWith(".facet")) {
+                i.remove();
+            }
+        }
+        //
+        return criteria;
+    }
 
     /**
      * Determines the facet types of the selected topicmap.
