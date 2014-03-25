@@ -321,22 +321,29 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
      *              b) the geomap is not associated to a Kiezatlas Website.
      */
     private ResultList<RelatedTopic> getFacetTypes(ClientState clientState) {
-        long topicmapId = clientState.getLong("dm4_topicmap_id");
-        //
-        if (!isGeomap(topicmapId)) {
-            logger.info("### Finding geo object facet types for topicmap " + topicmapId + " ABORTED -- not a geomap");
+        long topicmapId;
+        try {
+            topicmapId = clientState.getLong("dm4_topicmap_id");
+            //
+            if (!isGeomap(topicmapId)) {
+                logger.info("### Finding geo object facet types for topicmap " + topicmapId + " ABORTED -- not a geomap");
+                return null;
+            }
+            //
+            Topic website = getWebsite(topicmapId);
+            if (website == null) {
+                logger.info("### Finding geo object facet types for geomap " + topicmapId + " ABORTED -- not part of a " +
+                    "Kiezatlas website");
+                return null;
+            }
+            //
+            logger.info("### Finding geo object facet types for geomap " + topicmapId);
+            return getFacetTypes(website.getId());
+        } catch (NumberFormatException nfe) {
+            logger.warning("Could not determine facet type because \"dm4_topicmap_id\" cookie value was either not "
+                    + "set at all by the client requesting or could not be parsed to a numeric (long) value.");
             return null;
         }
-        //
-        Topic website = getWebsite(topicmapId);
-        if (website == null) {
-            logger.info("### Finding geo object facet types for geomap " + topicmapId + " ABORTED -- not part of a " +
-                "Kiezatlas website");
-            return null;
-        }
-        //
-        logger.info("### Finding geo object facet types for geomap " + topicmapId);
-        return getFacetTypes(website.getId());
     }
 
     private List<Topic> fetchGeoObjects(long geomapId) {
