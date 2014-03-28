@@ -314,15 +314,22 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
     }
 
     /**
-     * Determines the facet types of the selected topicmap.
+     * Returns the facet types for the current topicmap, or null if the facet types can't be determined.
+     * There can be several reasons for the latter:
+     *   a) there is no "current topicmap". This can be the case with 3rd-party clients.
+     *   b) the current topicmap is not a geomap.
+     *   c) the geomap is not part of a Kiezatlas Website.
      *
      * @return  The facet types (as a result set, may be empty), or <code>null</code> if
-     *              a) the selected topicmap is not a geomap, or
-     *              b) the geomap is not associated to a Kiezatlas Website.
      */
     private ResultList<RelatedTopic> getFacetTypes(ClientState clientState) {
-        long topicmapId = clientState.getLong("dm4_topicmap_id");
+        if (!clientState.has("dm4_topicmap_id")) {
+            logger.info("### Finding geo object facet types ABORTED -- topicmap is unknown (no \"dm4_topicmap_id\" " +
+                "cookie was sent)");
+            return null;
+        }
         //
+        long topicmapId = clientState.getLong("dm4_topicmap_id");
         if (!isGeomap(topicmapId)) {
             logger.info("### Finding geo object facet types for topicmap " + topicmapId + " ABORTED -- not a geomap");
             return null;
