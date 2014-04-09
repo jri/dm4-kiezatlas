@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.kiezatlas;
 
+import de.deepamehta.plugins.kiezatlas.service.KiezatlasService;
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.plugins.facets.service.FacetsService;
@@ -40,7 +41,8 @@ import java.util.logging.Logger;
 @Path("/site")
 @Consumes("application/json")
 @Produces("application/json")
-public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicListener, PreSendTopicListener {
+public class KiezatlasPlugin extends PluginActivator implements KiezatlasService, PostUpdateTopicListener,
+                                                                                  PreSendTopicListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -85,6 +87,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
     @GET
     @Path("/geomap/{geomap_id}")
+    @Override
     public Topic getWebsite(@PathParam("geomap_id") long geomapId) {
         try {
             return dms.getTopic(geomapId, false).getRelatedTopic(WEBSITE_GEOMAP, ROLE_TYPE_WEBSITE,
@@ -96,6 +99,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
     @GET
     @Path("/{website_id}/facets")
+    @Override
     public ResultList<RelatedTopic> getFacetTypes(@PathParam("website_id") long websiteId) {
         try {
             return dms.getTopic(websiteId, false).getRelatedTopics(WEBSITE_FACET_TYPES, ROLE_TYPE_WEBSITE,
@@ -107,6 +111,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
 
     @GET
     @Path("/geomap/{geomap_id}/objects")
+    @Override
     public List<Topic> getGeoObjects(@PathParam("geomap_id") long geomapId) {
         try {
             return fetchGeoObjects(geomapId);
@@ -115,22 +120,17 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
         }
     }
 
-    /**
-     * Finds all Geo Objects categorized by the specified category.
-     */
     @GET
     @Path("/category/{id}/objects")
+    @Override
     public List<RelatedTopic> getGeoObjectsByCategory(@PathParam("id") long categoryId) {
         return dms.getTopic(categoryId, false).getRelatedTopics("dm4.core.aggregation", "dm4.core.child",
             "dm4.core.parent", "ka2.geo_object", false, false, 0).getItems();
     }
 
-    /**
-     * Finds all categories that match the search term (case-insensitive substring search) and returns all geo objects
-     * of those categories, grouped by category.
-     */
     @GET
     @Path("/geoobject")
+    @Override
     public SearchResult searchGeoObjects(@QueryParam("search") String searchTerm) {
         SearchResult result = new SearchResult();
         for (Topic criteria : getCriteria()) {
@@ -320,7 +320,7 @@ public class KiezatlasPlugin extends PluginActivator implements PostUpdateTopicL
      *   b) the current topicmap is not a geomap.
      *   c) the geomap is not part of a Kiezatlas Website.
      *
-     * @return  The facet types (as a result set, may be empty), or <code>null</code> if
+     * @return  The facet types (as a result set, may be empty), or <code>null</code>.
      */
     private ResultList<RelatedTopic> getFacetTypes(ClientState clientState) {
         if (!clientState.has("dm4_topicmap_id")) {

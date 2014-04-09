@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * A search result of Geo Objects, grouped by category, then grouped by criteria
  */
-class SearchResult implements JSONEnabled {
+public class SearchResult implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
