@@ -131,8 +131,8 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     @GET
     @Path("/geoobject")
     @Override
-    public SearchResult searchGeoObjects(@QueryParam("search") String searchTerm) {
-        SearchResult result = new SearchResult();
+    public SearchResult searchGeoObjects(@QueryParam("search") String searchTerm, @QueryParam("clock") long clock) {
+        SearchResult result = new SearchResult(clock);
         for (Topic criteria : getCriteria()) {
             for (Topic category : dms.searchTopics("*" + searchTerm + "*", criteria.getUri())) {
                 List<RelatedTopic> geoObjects = getGeoObjectsByCategory(category.getId());

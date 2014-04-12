@@ -20,15 +20,16 @@ public class SearchResult implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private JSONObject result = new JSONObject();
-    private JSONArray criteriaArray = new JSONArray();
-    private JSONArray categoriesArray;
+    private JSONArray criteriaResult = new JSONArray();
+    private JSONArray categoriesResult;
     private long currentCriteriaId;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    SearchResult() {
+    SearchResult(long clock) {
         try {
-            result.put("search_result", criteriaArray);
+            result.put("items", criteriaResult);
+            result.put("clock", clock);
         } catch (Exception e) {
             throw new RuntimeException("Constructing a SearchResult failed", e);
         }
@@ -40,15 +41,15 @@ public class SearchResult implements JSONEnabled {
         try {
             // start new criteria
             if (criteria.getId() != currentCriteriaId) {
-                categoriesArray = new JSONArray();
-                criteriaArray.put(new JSONObject()
+                categoriesResult = new JSONArray();
+                criteriaResult.put(new JSONObject()
                     .put("criteria", criteria.toJSON())
-                    .put("categories", categoriesArray)
+                    .put("categories", categoriesResult)
                 );
                 currentCriteriaId = criteria.getId();
             }
             //
-            categoriesArray.put(new JSONObject()
+            categoriesResult.put(new JSONObject()
                 .put("category", category.toJSON())
                 .put("geo_objects", DeepaMehtaUtils.objectsToJSON(geoObjects))
             );

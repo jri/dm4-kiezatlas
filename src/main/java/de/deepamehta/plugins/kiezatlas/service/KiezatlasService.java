@@ -36,6 +36,9 @@ public interface KiezatlasService extends PluginService {
     /**
      * Finds all categories that match the search term (case-insensitive substring search)
      * and returns all Geo Objects of those categories, grouped by category.
+     *
+     * @param   clock   The logical clock value send back to the client (as part of search result).
+     *                  Allows the client to order asynchronous responses.
      */
-    SearchResult searchGeoObjects(String searchTerm);
+    SearchResult searchGeoObjects(String searchTerm, long clock);
 }
