@@ -1,6 +1,6 @@
-package de.deepamehta.plugins.kiezatlas.service;
+package de.kiezatlas.service;
 
-import de.deepamehta.plugins.kiezatlas.SearchResult;
+import de.kiezatlas.SearchResult;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;

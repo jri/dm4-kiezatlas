@@ -1,4 +1,4 @@
-dm4c.add_plugin("de.deepamehta.kiezatlas", function() {
+dm4c.add_plugin("de.kiezatlas", function() {
 
     // === REST Client Extension ===
 

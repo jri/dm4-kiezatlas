@@ -1,10 +1,10 @@
-package de.deepamehta.plugins.kiezatlas;
+package de.kiezatlas;
 
-import de.deepamehta.plugins.kiezatlas.service.KiezatlasService;
+import de.kiezatlas.service.KiezatlasService;
+
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.plugins.facets.service.FacetsService;
-
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;

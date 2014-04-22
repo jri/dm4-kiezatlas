@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.kiezatlas;
+package de.kiezatlas;
 
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Topic;
