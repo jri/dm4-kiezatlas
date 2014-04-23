@@ -348,10 +348,9 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
 
     private List<Topic> fetchGeoObjects(long geomapId) {
         List<Topic> geoObjects = new ArrayList();
-        ResultList<RelatedTopic> geomapTopics = geomapsService.getGeomapTopics(geomapId);
-        for (RelatedTopic topic : geomapTopics) {
-            Topic geoTopic = geomapsService.getGeoTopic(topic.getId());
-            geoObjects.add(geoTopic);
+        for (TopicModel geoCoord : geomapsService.getGeomap(geomapId)) {
+            Topic geoObject = geomapsService.getDomainTopic(geoCoord.getId());
+            geoObjects.add(geoObject);
             // ### TODO: optimization. Include only name and address in returned geo objects.
             // ### For the moment the entire objects are returned, including composite values and facets.
         }
