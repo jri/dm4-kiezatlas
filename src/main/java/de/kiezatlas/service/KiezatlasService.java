@@ -1,6 +1,7 @@
 package de.kiezatlas.service;
 
-import de.kiezatlas.SearchResult;
+import de.kiezatlas.GeoObjects;
+import de.kiezatlas.GroupedGeoObjects;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -34,11 +35,19 @@ public interface KiezatlasService extends PluginService {
     List<RelatedTopic> getGeoObjectsByCategory(long categoryId);
 
     /**
-     * Finds all categories that match the search term (case-insensitive substring search)
-     * and returns all Geo Objects of those categories, grouped by category.
+     * Searches for Geo Objects whose name match the search term (case-insensitive substring search).
      *
-     * @param   clock   The logical clock value send back to the client (as part of search result).
+     * @param   clock   The logical clock value send back to the client (contained in GeoObjects).
      *                  Allows the client to order asynchronous responses.
      */
-    SearchResult searchGeoObjects(String searchTerm, long clock);
+    GeoObjects searchGeoObjects(String searchTerm, long clock);
+
+    /**
+     * Searches for categories that match the search term (case-insensitive substring search)
+     * and returns all Geo Objects of those categories, grouped by category.
+     *
+     * @param   clock   The logical clock value send back to the client (contained in GroupedGeoObjects).
+     *                  Allows the client to order asynchronous responses.
+     */
+    GroupedGeoObjects searchCategories(String searchTerm, long clock);
 }

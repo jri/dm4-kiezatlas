@@ -46,6 +46,9 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    private static final String TYPE_URI_GEO_OBJECT      = "ka2.geo_object";
+    private static final String TYPE_URI_GEO_OBJECT_NAME = "ka2.geo_object.name";
+
     // Website-Geomap association
     private static final String WEBSITE_GEOMAP = "dm4.core.association";
     private static final String ROLE_TYPE_WEBSITE = "dm4.core.default";     // Note: used for both associations
@@ -125,15 +128,27 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     @Override
     public List<RelatedTopic> getGeoObjectsByCategory(@PathParam("id") long categoryId) {
         return dms.getTopic(categoryId, false).getRelatedTopics("dm4.core.aggregation", "dm4.core.child",
-            "dm4.core.parent", "ka2.geo_object", false, false, 0).getItems();
+            "dm4.core.parent", TYPE_URI_GEO_OBJECT, false, false, 0).getItems();
     }
 
     @GET
     @Path("/geoobject")
     @Override
-    public SearchResult searchGeoObjects(@QueryParam("search") String searchTerm, @QueryParam("clock") long clock) {
-        SearchResult result = new SearchResult(clock);
-        for (Topic criteria : getCriteria()) {
+    public GeoObjects searchGeoObjects(@QueryParam("search") String searchTerm, @QueryParam("clock") long clock) {
+        GeoObjects result = new GeoObjects(clock);
+        for (Topic geoObjectName : dms.searchTopics("*" + searchTerm + "*", TYPE_URI_GEO_OBJECT_NAME)) {
+            result.add(getGeoObject(geoObjectName));
+        }
+        return result;
+    }
+
+    @GET
+    @Path("/category/objects")
+    @Override
+    public GroupedGeoObjects searchCategories(@QueryParam("search") String searchTerm,
+                                              @QueryParam("clock") long clock) {
+        GroupedGeoObjects result = new GroupedGeoObjects(clock);
+        for (Topic criteria : fetchAllCriteria()) {
             for (Topic category : dms.searchTopics("*" + searchTerm + "*", criteria.getUri())) {
                 List<RelatedTopic> geoObjects = getGeoObjectsByCategory(category.getId());
                 result.add(criteria, category, geoObjects);
@@ -187,7 +202,7 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
 
     @Override
     public void preSendTopic(Topic topic, ClientState clientState) {
-        if (!topic.getTypeUri().equals("ka2.geo_object")) {
+        if (!topic.getTypeUri().equals(TYPE_URI_GEO_OBJECT)) {
             return;
         }
         //
@@ -202,7 +217,7 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     @Override
     public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                        Directives directives) {
-        if (!topic.getTypeUri().equals("ka2.geo_object")) {
+        if (!topic.getTypeUri().equals(TYPE_URI_GEO_OBJECT)) {
             return;
         }
         //
@@ -299,7 +314,7 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
      * Returns all Kiezatlas ctriteria. A Kiezatlas ctriteria is a topic type whose URI starts with
      * <code>ka2.criteria.</code> but does not end with <code>.facet</code>.
      */
-    private List<Topic> getCriteria() {
+    private List<Topic> fetchAllCriteria() {
         List<Topic> criteria = dms.getTopics("uri", new SimpleValue("ka2.criteria.*"), false);
         // remove facet types
         Iterator<Topic> i = criteria.iterator();
@@ -358,6 +373,11 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     }
 
     // ---
+
+    private Topic getGeoObject(Topic geoObjectName) {
+        return geoObjectName.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
+            TYPE_URI_GEO_OBJECT, false, false); // ### TODO: Core API should provide type-driven navigation
+    }
 
     private boolean isGeomap(long topicmapId) {
         Topic topicmap = dms.getTopic(topicmapId, true);

@@ -13,9 +13,10 @@ import java.util.List;
 
 
 /**
- * A search result of Geo Objects, grouped by category, then grouped by criteria
+ * A collection of Geo Objects as returned by the Kiezatlas service (a data transfer object).
+ * The Geo Objects are grouped by category, then grouped by criteria.
  */
-public class SearchResult implements JSONEnabled {
+public class GroupedGeoObjects implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -26,12 +27,12 @@ public class SearchResult implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    SearchResult(long clock) {
+    GroupedGeoObjects(long clock) {
         try {
             result.put("items", criteriaResult);
             result.put("clock", clock);
         } catch (Exception e) {
-            throw new RuntimeException("Constructing a SearchResult failed", e);
+            throw new RuntimeException("Constructing a GroupedGeoObjects failed", e);
         }
     }
 
@@ -54,7 +55,7 @@ public class SearchResult implements JSONEnabled {
                 .put("geo_objects", DeepaMehtaUtils.objectsToJSON(geoObjects))
             );
         } catch (Exception e) {
-            throw new RuntimeException("Adding items to a SearchResult failed", e);
+            throw new RuntimeException("Adding items to a GroupedGeoObjects failed", e);
         }
     }
 
