@@ -15,15 +15,15 @@ public class GeoObjects implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private JSONObject result = new JSONObject();
+    private JSONObject json = new JSONObject();
     private JSONArray items = new JSONArray();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     GeoObjects(long clock) {
         try {
-            result.put("items", items);
-            result.put("clock", clock);
+            json.put("items", items);
+            json.put("clock", clock);
         } catch (Exception e) {
             throw new RuntimeException("Constructing GeoObjects failed", e);
         }
@@ -41,6 +41,6 @@ public class GeoObjects implements JSONEnabled {
 
     @Override
     public JSONObject toJSON() {
-        return result;
+        return json;
     }
 }

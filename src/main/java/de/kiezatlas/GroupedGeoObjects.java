@@ -20,7 +20,7 @@ public class GroupedGeoObjects implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private JSONObject result = new JSONObject();
+    private JSONObject json = new JSONObject();
     private JSONArray criteriaResult = new JSONArray();
     private JSONArray categoriesResult;
     private long currentCriteriaId;
@@ -29,8 +29,8 @@ public class GroupedGeoObjects implements JSONEnabled {
 
     GroupedGeoObjects(long clock) {
         try {
-            result.put("items", criteriaResult);
-            result.put("clock", clock);
+            json.put("items", criteriaResult);
+            json.put("clock", clock);
         } catch (Exception e) {
             throw new RuntimeException("Constructing a GroupedGeoObjects failed", e);
         }
@@ -61,6 +61,6 @@ public class GroupedGeoObjects implements JSONEnabled {
 
     @Override
     public JSONObject toJSON() {
-        return result;
+        return json;
     }
 }
