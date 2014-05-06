@@ -256,20 +256,20 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
         // 1) The geo object has just been created (no update yet)
         // 2) The geo object has been created outside a geomap and then being revealed in a geomap.
         if (facetValue == null) {
-            logger.info("### Enriching geo object " + geoObject.getId() + " with its \"" + facetTypeUri + "\" facet " +
-                "ABORTED -- no such facet in DB");
+            logger.info("### Enriching geo object " + geoObject.getId() + " with its \"" + facetTypeUri +
+                "\" facet value ABORTED -- no such facet in DB");
             return;
         }
         //
-        logger.info("### Enriching geo object " + geoObject.getId() + " with its \"" + facetTypeUri + "\" facet (" +
-            facetValue + ")");
+        logger.info("### Enriching geo object " + geoObject.getId() + " with its \"" + facetTypeUri +
+            "\" facet value (" + facetValue + ")");
         geoObject.getCompositeValue().getModel().put(facetValue.getTypeUri(), facetValue.getModel());
     }
 
     private void enrichWithMultiFacet(Topic geoObject, String facetTypeUri) {
         List<RelatedTopic> facetValues = facetsService.getFacets(geoObject, facetTypeUri);
-        logger.info("### Enriching geo object " + geoObject.getId() + " with its \"" + facetTypeUri + "\" facets (" +
-            facetValues + ")");
+        logger.info("### Enriching geo object " + geoObject.getId() + " with its \"" + facetTypeUri +
+            "\" facet values (" + facetValues + ")");
         String childTypeUri = getChildTypeUri(facetTypeUri);
         // Note: we set the facet values at once (using put()) instead of iterating (and using add()) as after an geo
         // object update request the facet values are already set. Using add() would result in having the values twice.
