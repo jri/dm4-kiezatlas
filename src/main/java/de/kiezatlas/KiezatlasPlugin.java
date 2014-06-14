@@ -2,6 +2,7 @@ package de.kiezatlas;
 
 import de.kiezatlas.service.KiezatlasService;
 
+import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.plugins.facets.service.FacetsService;
@@ -171,11 +172,7 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
      * This ensures the Kiezatlas types are properly setup for Access Control.
      */
     @Override
-    @ConsumesService({
-        "de.deepamehta.plugins.geomaps.service.GeomapsService",
-        "de.deepamehta.plugins.facets.service.FacetsService",
-        "de.deepamehta.plugins.accesscontrol.service.AccessControlService"
-    })
+    @ConsumesService({GeomapsService.class, FacetsService.class, AccessControlService.class})
     public void serviceArrived(PluginService service) {
         if (service instanceof GeomapsService) {
             geomapsService = (GeomapsService) service;
