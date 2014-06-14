@@ -34,6 +34,10 @@ Usage
 Version History
 ---------------
 
+**2.1.6** -- upcoming
+
+* Compatible with DeepaMehta 4.4-SNAPSHOT
+
 **2.1.5** -- Jun 8, 2014
 
 * Extended Kiezatlas service: search Geo Objects by name/category, searching categories.
@@ -77,4 +81,4 @@ Version History
 
 ------------
 Jörg Richter  
-Jun 8, 2014
+Jun 14, 2014
