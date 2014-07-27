@@ -57,7 +57,6 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     private static final String ROLE_TYPE_GEOMAP = "dm4.core.default";
     // Website-Facet Types association
     private static final String WEBSITE_FACET_TYPES = "dm4.core.association";
-    // private static final String ROLE_TYPE_WEBSITE = "dm4.core.default";
     private static final String ROLE_TYPE_FACET_TYPE = "dm4.core.default";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -115,6 +114,23 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     }
 
     @GET
+    @Path("/criteria")
+    @Override
+    public List<Topic> getAllCriteria() {
+        List<Topic> criteria = dms.getTopics("uri", new SimpleValue("ka2.criteria.*"), false);
+        // remove facet types
+        Iterator<Topic> i = criteria.iterator();
+        while (i.hasNext()) {
+            Topic crit = i.next();
+            if (crit.getUri().endsWith(".facet")) {
+                i.remove();
+            }
+        }
+        //
+        return criteria;
+    }
+
+    @GET
     @Path("/geomap/{geomap_id}/objects")
     @Override
     public List<Topic> getGeoObjects(@PathParam("geomap_id") long geomapId) {
@@ -150,7 +166,7 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     public GroupedGeoObjects searchCategories(@QueryParam("search") String searchTerm,
                                               @QueryParam("clock") long clock) {
         GroupedGeoObjects result = new GroupedGeoObjects(clock);
-        for (Topic criteria : fetchAllCriteria()) {
+        for (Topic criteria : getAllCriteria()) {
             for (Topic category : dms.searchTopics("*" + searchTerm + "*", criteria.getUri())) {
                 List<RelatedTopic> geoObjects = getGeoObjectsByCategory(category.getId());
                 result.add(criteria, category, geoObjects);
@@ -301,24 +317,6 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
 
 
     // === Helper ===
-
-    /**
-     * Returns all Kiezatlas ctriteria. A Kiezatlas ctriteria is a topic type whose URI starts with
-     * <code>ka2.criteria.</code> but does not end with <code>.facet</code>.
-     */
-    private List<Topic> fetchAllCriteria() {
-        List<Topic> criteria = dms.getTopics("uri", new SimpleValue("ka2.criteria.*"), false);
-        // remove facet types
-        Iterator<Topic> i = criteria.iterator();
-        while (i.hasNext()) {
-            Topic crit = i.next();
-            if (crit.getUri().endsWith(".facet")) {
-                i.remove();
-            }
-        }
-        //
-        return criteria;
-    }
 
     /**
      * Returns the facet types for the current topicmap, or null if the facet types can't be determined.

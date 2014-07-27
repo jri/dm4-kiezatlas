@@ -25,6 +25,11 @@ public interface KiezatlasService extends PluginService {
     ResultList<RelatedTopic> getFacetTypes(long websiteId);
 
     /**
+     * Returns all Kiezatlas criteria existing in the DB. ### Experimental
+     */
+    List<Topic> getAllCriteria();
+
+    /**
      * Returns all Geo Objects assigned to the given geomap.
      */
     List<Topic> getGeoObjects(long geomapId);
