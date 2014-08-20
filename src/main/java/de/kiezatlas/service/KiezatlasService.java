@@ -26,6 +26,8 @@ public interface KiezatlasService extends PluginService {
 
     /**
      * Returns all Kiezatlas criteria existing in the DB. ### Experimental
+     * A Kiezatlas criteria is a topic type whose URI starts with <code>ka2.criteria.</code>
+     * but does not end with <code>.facet</code>.
      */
     List<Topic> getAllCriteria();
 
@@ -37,7 +39,7 @@ public interface KiezatlasService extends PluginService {
     /**
      * Returns all Geo Objects assigned to the given category.
      */
-    List<RelatedTopic> getGeoObjectsByCategory(long categoryId);
+    List<RelatedTopic> getGeoObjectsByCategory(long categoryId, boolean fetchComposite);
 
     /**
      * Searches for Geo Objects whose name match the search term (case-insensitive substring search).

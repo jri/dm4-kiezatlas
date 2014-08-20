@@ -144,9 +144,10 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     @GET
     @Path("/category/{id}/objects")
     @Override
-    public List<RelatedTopic> getGeoObjectsByCategory(@PathParam("id") long categoryId) {
+    public List<RelatedTopic> getGeoObjectsByCategory(@PathParam("id") long categoryId,
+                                                      @QueryParam("fetch_composite") boolean fetchComposite) {
         return dms.getTopic(categoryId, false).getRelatedTopics("dm4.core.aggregation", "dm4.core.child",
-            "dm4.core.parent", TYPE_URI_GEO_OBJECT, false, false, 0).getItems();
+            "dm4.core.parent", TYPE_URI_GEO_OBJECT, fetchComposite, false, 0).getItems();
     }
 
     @GET
@@ -168,7 +169,8 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
         GroupedGeoObjects result = new GroupedGeoObjects(clock);
         for (Topic criteria : getAllCriteria()) {
             for (Topic category : dms.searchTopics("*" + searchTerm + "*", criteria.getUri())) {
-                List<RelatedTopic> geoObjects = getGeoObjectsByCategory(category.getId());
+                List<RelatedTopic> geoObjects = getGeoObjectsByCategory(category.getId(), false);
+                                                                                       // fetchComposite=false
                 result.add(criteria, category, geoObjects);
             }
         }
