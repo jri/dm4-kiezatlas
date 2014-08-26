@@ -14,9 +14,8 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -61,8 +60,14 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    @Inject
     private GeomapsService geomapsService;
+
+    @Inject
     private FacetsService facetsService;
+
+    // ### FIXME: must *wait* for the Access Control service but don't actually *consume* it.
+    // This ensures the Kiezatlas types are properly setup for Access Control.
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -162,37 +167,6 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
             }
         }
         return result;
-    }
-
-
-
-    // ****************************
-    // *** Hook Implementations ***
-    // ****************************
-
-
-
-    /**
-     * Note: we *wait* for the Access Control service but we don't actually *consume* it.
-     * This ensures the Kiezatlas types are properly setup for Access Control.
-     */
-    @Override
-    @ConsumesService({GeomapsService.class, FacetsService.class, AccessControlService.class})
-    public void serviceArrived(PluginService service) {
-        if (service instanceof GeomapsService) {
-            geomapsService = (GeomapsService) service;
-        } else if (service instanceof FacetsService) {
-            facetsService = (FacetsService) service;
-        }
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        if (service == geomapsService) {
-            geomapsService = null;
-        } else if (service == facetsService) {
-            facetsService = null;
-        }
     }
 
 
