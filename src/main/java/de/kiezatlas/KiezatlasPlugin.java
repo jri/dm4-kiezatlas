@@ -70,24 +70,11 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
 
 
 
-
     // **********************
     // *** Plugin Service ***
     // **********************
 
 
-
-    @GET
-    @Path("/{url}")
-    @Produces("text/html")
-    public InputStream launchWebclient() {
-        try {
-            // Note: the template parameters are evaluated at client-side
-            return dms.getPlugin("de.deepamehta.webclient").getResourceAsStream("web/index.html");
-        } catch (Exception e) {
-            throw new RuntimeException("Launching the webclient failed", e);
-        }
-    }
 
     @GET
     @Path("/geomap/{geomap_id}")
