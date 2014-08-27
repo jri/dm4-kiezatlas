@@ -6,14 +6,14 @@ import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.plugins.facets.service.FacetsService;
+
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
@@ -21,17 +21,12 @@ import de.deepamehta.core.service.event.PreSendTopicListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.POST;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -67,7 +62,7 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     private FacetsService facetsService;
 
     // ### FIXME: must *wait* for the Access Control service but don't actually *consume* it.
-    // This ensures the Kiezatlas types are properly setup for Access Control.
+    // This ensures the Kiezatlas types are properly setup for Access Control. ### Still required?
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -178,12 +173,12 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
 
 
     @Override
-    public void preSendTopic(Topic topic, ClientState clientState) {
+    public void preSendTopic(Topic topic) {
         if (!topic.getTypeUri().equals(TYPE_URI_GEO_OBJECT)) {
             return;
         }
         //
-        ResultList<RelatedTopic> facetTypes = getFacetTypes(clientState);
+        ResultList<RelatedTopic> facetTypes = getFacetTypes();
         if (facetTypes == null) {
             return;
         }
@@ -192,18 +187,17 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                       Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
         if (!topic.getTypeUri().equals(TYPE_URI_GEO_OBJECT)) {
             return;
         }
         //
-        ResultList<RelatedTopic> facetTypes = getFacetTypes(clientState);
+        ResultList<RelatedTopic> facetTypes = getFacetTypes();
         if (facetTypes == null) {
             return;
         }
         //
-        updateFacets(topic, facetTypes, newModel, clientState, directives);
+        updateFacets(topic, facetTypes, newModel);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -256,8 +250,7 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
 
     // === Update facets ===
 
-    private void updateFacets(Topic geoObject, ResultList<RelatedTopic> facetTypes, TopicModel newModel,
-                                                                       ClientState clientState, Directives directives) {
+    private void updateFacets(Topic geoObject, ResultList<RelatedTopic> facetTypes, TopicModel newModel) {
         for (Topic facetType : facetTypes) {
             String facetTypeUri = facetType.getUri();
             String childTypeUri = getChildTypeUri(facetTypeUri);
@@ -266,13 +259,13 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
                 logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + geoObject.getId() +
                     " (facetValue=" + facetValue + ")");
                 FacetValue value = new FacetValue(childTypeUri).put(facetValue);
-                facetsService.updateFacet(geoObject, facetTypeUri, value, clientState, directives);
+                facetsService.updateFacet(geoObject, facetTypeUri, value);
             } else {
                 List<TopicModel> facetValues = newModel.getCompositeValueModel().getTopics(childTypeUri);
                 logger.info("### Storing facets of type \"" + facetTypeUri + "\" for geo object " + geoObject.getId() +
                     " (facetValues=" + facetValues + ")");
                 FacetValue value = new FacetValue(childTypeUri).put(facetValues);
-                facetsService.updateFacet(geoObject, facetTypeUri, value, clientState, directives);
+                facetsService.updateFacet(geoObject, facetTypeUri, value);
             }
         }
     }
@@ -290,14 +283,16 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
      *
      * @return  The facet types (as a result set, may be empty), or <code>null</code>.
      */
-    private ResultList<RelatedTopic> getFacetTypes(ClientState clientState) {
-        if (!clientState.has("dm4_topicmap_id")) {
+    private ResultList<RelatedTopic> getFacetTypes() {
+        Cookies cookies = Cookies.get();
+        //
+        if (!cookies.has("dm4_topicmap_id")) {
             logger.info("### Finding geo object facet types ABORTED -- topicmap is unknown (no \"dm4_topicmap_id\" " +
                 "cookie was sent)");
             return null;
         }
         //
-        long topicmapId = clientState.getLong("dm4_topicmap_id");
+        long topicmapId = cookies.getLong("dm4_topicmap_id");
         if (!isGeomap(topicmapId)) {
             logger.info("### Finding geo object facet types for topicmap " + topicmapId + " ABORTED -- not a geomap");
             return null;
