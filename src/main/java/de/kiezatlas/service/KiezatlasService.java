@@ -39,7 +39,7 @@ public interface KiezatlasService extends PluginService {
     /**
      * Returns all Geo Objects assigned to the given category.
      */
-    List<RelatedTopic> getGeoObjectsByCategory(long categoryId, boolean fetchComposite);
+    List<RelatedTopic> getGeoObjectsByCategory(long categoryId);
 
     /**
      * Searches for Geo Objects whose name match the search term (case-insensitive substring search).
