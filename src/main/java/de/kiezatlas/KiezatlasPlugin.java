@@ -117,6 +117,7 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
         return criteria;
     }
 
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/geomap/{geomap_id}/objects")
     @Override

@@ -8,8 +8,10 @@ dm4c.add_plugin("de.kiezatlas", function() {
     dm4c.restc.get_facet_types = function(website_id) {
         return this.request("GET", "/site/" + website_id + "/facets")
     }
-    dm4c.restc.get_geo_objects = function(geomap_id) {
-        return dm4c.build_topics(this.request("GET", "/site/geomap/" + geomap_id + "/objects"))
+    dm4c.restc.get_geo_objects = function(geomap_id, include_childs) {
+        var params = this.createRequestParameter({include_childs: include_childs})
+        return dm4c.build_topics(this.request("GET", "/site/geomap/" + geomap_id + "/objects" +
+            params.to_query_string()))
     }
 
     // === Webclient Listeners ===
@@ -43,7 +45,7 @@ dm4c.add_plugin("de.kiezatlas", function() {
             return
         }
         // fetch geo objects
-        var geo_objects = dm4c.restc.get_geo_objects(topicmap.get_id())
+        var geo_objects = dm4c.restc.get_geo_objects(topicmap.get_id(), true)   // include_childs=true
         // render list
         var list = dm4c.render.topic_list(geo_objects, click_handler, render_handler)
         dm4c.render.page(list)
