@@ -9,7 +9,7 @@ A rewrite of Kiezatlas 1.6.
 Requirements
 ------------
 
-* A DeepaMehta 4.3 installation  
+* A DeepaMehta 4.4 installation  
   <https://github.com/jri/deepamehta>
 
 
@@ -17,9 +17,9 @@ Installation
 ------------
 
 1. Download the DM4 Kiezatlas plugin:  
-   <http://download.deepamehta.de/dm43-kiezatlas-2.1.5.jar>
+   <http://download.deepamehta.de/dm44-kiezatlas-2.1.6.jar>
 
-2. Move the DM4 Kiezatlas plugin to the `deepamehta-4.3/bundle` folder.
+2. Move the DM4 Kiezatlas plugin to the `deepamehta-4.4/bundle` folder.
 
 3. Restart DeepaMehta.
 
@@ -34,9 +34,10 @@ Usage
 Version History
 ---------------
 
-**2.1.6** -- upcoming
+**2.1.6** -- Dec 4, 2014
 
-* Compatible with DeepaMehta 4.4-SNAPSHOT
+* Add getAllCriteria() to Kiezatlas service.
+* Compatible with DeepaMehta 4.4
 
 **2.1.5** -- Jun 8, 2014
 
@@ -81,4 +82,4 @@ Version History
 
 ------------
 Jörg Richter  
-Jun 14, 2014
+Dec 4, 2014

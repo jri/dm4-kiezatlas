@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Kiezatlas</name>
     <groupId>de.kiezatlas</groupId>
     <artifactId>dm44-kiezatlas</artifactId>
-    <version>2.1.6-SNAPSHOT</version>
+    <version>2.1.6</version>
     <packaging>bundle</packaging>
 
     <parent>
