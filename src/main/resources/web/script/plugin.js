@@ -9,9 +9,8 @@ dm4c.add_plugin("de.kiezatlas", function() {
         return this.request("GET", "/site/" + website_id + "/facets")
     }
     dm4c.restc.get_geo_objects = function(geomap_id, include_childs) {
-        var params = this.createRequestParameter({include_childs: include_childs})
-        return dm4c.build_topics(this.request("GET", "/site/geomap/" + geomap_id + "/objects" +
-            params.to_query_string()))
+        var params = this.queryParams({include_childs: include_childs})
+        return dm4c.build_topics(this.request("GET", "/site/geomap/" + geomap_id + "/objects" + params))
     }
 
     // === Webclient Listeners ===
@@ -101,7 +100,7 @@ dm4c.add_plugin("de.kiezatlas", function() {
             return
         }
         //
-        var facet_types = dm4c.restc.get_facet_types(website.id).items
+        var facet_types = dm4c.restc.get_facet_types(website.id)
         dm4c.get_plugin("de.deepamehta.facets").add_facets_to_page_model(topic, facet_types, page_model, render_mode)
     }
 
@@ -124,3 +123,5 @@ dm4c.add_plugin("de.kiezatlas", function() {
         return topicmap.get_renderer_uri() == "dm4.geomaps.geomap_renderer"
     }
 })
+// Enable debugging for dynamically loaded scripts:
+//# sourceURL=kiezatlas_plugin.js

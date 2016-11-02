@@ -9,6 +9,6 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        dms.getTopicType("ka2.geo_object.name").addIndexMode(IndexMode.FULLTEXT_KEY);
+        dm4.getTopicType("ka2.geo_object.name").addIndexMode(IndexMode.FULLTEXT_KEY);
     }
 }

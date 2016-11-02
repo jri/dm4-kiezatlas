@@ -1,18 +1,16 @@
-package de.kiezatlas.service;
+package de.kiezatlas;
 
 import de.kiezatlas.GeoObjects;
 import de.kiezatlas.GroupedGeoObjects;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.ResultList;
 
 import java.util.List;
 
 
 
-public interface KiezatlasService extends PluginService {
+public interface KiezatlasService {
 
     /**
      * Returns the "Kiezatlas Website" topic the given geomap is assigned to.
@@ -22,7 +20,7 @@ public interface KiezatlasService extends PluginService {
     /**
      * Returns the facet types assigned to the given Kiezatlas Website.
      */
-    ResultList<RelatedTopic> getFacetTypes(long websiteId);
+    List<RelatedTopic> getFacetTypes(long websiteId);
 
     /**
      * Returns all Kiezatlas criteria existing in the DB. ### Experimental

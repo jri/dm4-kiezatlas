@@ -52,7 +52,7 @@ public class GroupedGeoObjects implements JSONEnabled {
             //
             categoriesResult.put(new JSONObject()
                 .put("category", category.toJSON())
-                .put("geo_objects", DeepaMehtaUtils.objectsToJSON(geoObjects))
+                .put("geo_objects", DeepaMehtaUtils.toJSONArray(geoObjects))
             );
         } catch (Exception e) {
             throw new RuntimeException("Adding items to a GroupedGeoObjects failed", e);
