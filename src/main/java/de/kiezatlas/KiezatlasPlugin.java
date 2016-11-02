@@ -262,7 +262,10 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
                 List<? extends RelatedTopicModel> facetValues = newModel.getChildTopicsModel().getTopics(childTypeUri);
                 logger.info("### Storing facets of type \"" + facetTypeUri + "\" for geo object " + geoObject.getId() +
                     " (facetValues=" + facetValues + ")");
-                FacetValueModel value = mf.newFacetValueModel(childTypeUri).put(facetValues);
+                // Note: the cast is needed to call the correct form of the model put() method, which is overloaded.
+                // ### TODO: make the model's getters return List<RelatedTopicModel> directly (instead of
+                // List<? extends RelatedTopicModel>).
+                FacetValueModel value = mf.newFacetValueModel(childTypeUri).put((List<RelatedTopicModel>) facetValues);
                 facetsService.updateFacet(geoObject, facetTypeUri, value);
             }
         }
