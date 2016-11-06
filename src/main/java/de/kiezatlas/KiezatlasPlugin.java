@@ -253,7 +253,9 @@ public class KiezatlasPlugin extends PluginActivator implements KiezatlasService
             String facetTypeUri = facetType.getUri();
             String childTypeUri = getChildTypeUri(facetTypeUri);
             if (!isMultiFacet(facetTypeUri)) {
-                TopicModel facetValue = newModel.getChildTopicsModel().getTopic(childTypeUri);
+                // Note: declaring explicitly as RelatedTopicModel (instead of TopicModel) is needed to call the
+                // correct form of the model put() method, which is overloaded.
+                RelatedTopicModel facetValue = newModel.getChildTopicsModel().getTopic(childTypeUri);
                 logger.info("### Storing facet of type \"" + facetTypeUri + "\" for geo object " + geoObject.getId() +
                     " (facetValue=" + facetValue + ")");
                 FacetValueModel value = mf.newFacetValueModel(childTypeUri).put(facetValue);
